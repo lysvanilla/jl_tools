@@ -23,6 +23,11 @@ public class ExcelTableStructureReader {
         LinkedHashMap<String, TableStructure> tableMap = new LinkedHashMap<>();
         File file = new File(filePath);
 
+        if (!file.exists() || !file.isFile()) {
+            log.error("指定的Excel文件不存在或不是一个有效的文件: {}", filePath);
+            return tableMap;
+        }
+
         // 读取表基本信息
         List<TableStructure> tableStructures = FastExcel.read(file)
                 .sheet("表级信息")

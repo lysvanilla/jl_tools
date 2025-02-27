@@ -1,0 +1,2 @@
+Usage:java -jar jl_bank_tool.jar 参数1【必填，dev或者prod】 参数【必填2，文件名】
+Usage:java -jar jl_bank_tool.jar dev "D:\BaiduSyncdisk\工作目录\项目\2024年-北部湾银行湖仓一体实施项目\批量开发\数据采集批量开发v3.2.xlsx"

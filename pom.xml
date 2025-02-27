@@ -66,6 +66,18 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Hutool 核心库 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.36</version>
+        </dependency>
+        <!-- Jsoup 用于解析 HTML -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.3</version>
+        </dependency>
     </dependencies>
 
   <!--  &lt;!&ndash; 构建配置 &ndash;&gt;
