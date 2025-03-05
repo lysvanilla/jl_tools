@@ -1,8 +1,12 @@
 package cn.sunline.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TranslationResult {
     // 存储翻译后的英文文本
     private String translatedText;
@@ -11,12 +15,4 @@ public class TranslationResult {
     // 存储未匹配上的中文拆词
     private String unmatchedWords;
 
-    public TranslationResult() {
-    }
-
-    public TranslationResult(String translatedText, String splitWords, String unmatchedWords) {
-        this.translatedText = translatedText;
-        this.splitWords = splitWords;
-        this.unmatchedWords = unmatchedWords;
-    }
 }

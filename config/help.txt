@@ -1,4 +1,5 @@
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=wlh file_name="C:\Users\lysva\Desktop\物理化工具.xlsx"
+Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=ddl file_name="D:\svn\jilin\03.模型设计\风险数据集市物理模型-模板.xlsx"
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=zb file_name="D:\svn\jilin\02.需求分析\0202.智能风控系统\智能风控系统指标信息_20250304.xlsx"
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=cf file_name="D:\svn\jilin\02.需求分析\模板_吉林银行_风险数据集市逻辑设计文档-v0.1.xlsx"
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=hb file_name="D:\吉林银行\risk_20250305\模型拆分"

@@ -10,6 +10,7 @@ import cn.sunline.vo.SplitWordsFailure;
 import cn.sunline.vo.TranslationResult;
 import cn.sunline.vo.TranslationResultFull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -31,6 +32,7 @@ public class ChineseToEnglishTranslator {
 
         String filePath = "C:\\Users\\lysva\\Desktop\\物理化工具.xlsx";
         filePath = "C:\\Users\\lysva\\Desktop\\物理化工具.xlsx";
+        filePath = "D:\\Users\\Documents\\WXWork\\1688851370921495\\Cache\\File\\2025-03\\物理化工具.xlsx";
         // 用于存储中文到英文的映射字典
 
        /* ChineseToEnglishTranslator translator = new ChineseToEnglishTranslator();
@@ -79,7 +81,7 @@ public class ChineseToEnglishTranslator {
         //System.out.println(FileUtil.exist(templatePath)+"\t"+templatePath);
         //System.out.println(FileUtil.exist(outputPath)+"\t"+outputPath);
         try(ExcelWriter excelWriter = FastExcel.write(outputPath).withTemplate(templatePath).build()){
-            WriteSheet task_sheet = FastExcel.writerSheet("物理化工具").build();
+            WriteSheet task_sheet = FastExcel.writerSheet("物理化结果").build();
             excelWriter.fill(translationResultFullList,task_sheet);
 
             splitWordsFailureMap.putAll(splitWordsLeftFailureMap);
@@ -99,7 +101,7 @@ public class ChineseToEnglishTranslator {
     public static List<TranslationResultFull> readChineseFromExcel(String filePath) {
         File file = new File(filePath);
         return FastExcel.read(file)
-                .sheet("物理化结果")
+                .sheet("待物理化清单")
                 .head(TranslationResultFull.class)
                 .doReadSync();
     }
@@ -160,10 +162,7 @@ public class ChineseToEnglishTranslator {
         // 处理最后剩余的暂存未匹配字符
         if (tempUnmatched.length() > 0) {
             unmatched.add(tempUnmatched.toString());
-            List<String> splitWordsFailure = Arrays.asList(tempUnmatched.toString().split("#"));
-            splitWordsFailure.forEach(element -> splitWordsRightFailureMap.put("向右缺词根"+element,new SplitWordsFailure(element,"向右缺词根")));
         }
-
         // 创建一个翻译结果对象，包含翻译后的英文、拆分结果和未匹配结果
         return new TranslationResult(String.join("_", translated), String.join("#", splitWords), String.join("#", unmatched));
 
@@ -225,8 +224,6 @@ public class ChineseToEnglishTranslator {
         // 处理最后剩余的暂存未匹配字符
         if (tempUnmatched.length() > 0) {
             unmatched.add(0, tempUnmatched.toString());
-            List<String> splitWordsFailure = Arrays.asList(tempUnmatched.toString().split("#"));
-            splitWordsFailure.forEach(element -> splitWordsLeftFailureMap.put("向左缺词根"+element,new SplitWordsFailure(element,"向左缺词根")));
         }
 
         // 创建一个翻译结果对象，包含翻译后的英文、拆分结果和未匹配结果
@@ -243,6 +240,10 @@ public class ChineseToEnglishTranslator {
         String leftSplitWords = leftToRightResult.getSplitWords();
         String leftUnmatchedWords = leftToRightResult.getUnmatchedWords();
         String isLeftUnmatchedWords = leftUnmatchedWords.isEmpty() ? "否" : "缺词根";
+        if (StringUtils.isNotEmpty(leftUnmatchedWords)){
+            List<String> splitWordsFailure = Arrays.asList(leftUnmatchedWords.toString().split("#"));
+            splitWordsFailure.forEach(element -> splitWordsRightFailureMap.put("向右缺词根"+element,new SplitWordsFailure(element,"向右缺词根")));
+        }
 
 
         // 调用从右到左的翻译方法，得到翻译结果
@@ -252,6 +253,11 @@ public class ChineseToEnglishTranslator {
         String rightSplitWords = rightToLeftResult.getSplitWords();
         String rightUnmatchedWords = rightToLeftResult.getUnmatchedWords();
         String isRightUnmatchedWords = rightUnmatchedWords.isEmpty() ? "否" : "缺词根";
+        if (StringUtils.isNotEmpty(rightUnmatchedWords)){
+            List<String> splitWordsFailure = Arrays.asList(rightUnmatchedWords.toString().split("#"));
+            splitWordsFailure.forEach(element -> splitWordsLeftFailureMap.put("向左缺词根"+element,new SplitWordsFailure(element,"向左缺词根")));
+        }
+
 
         String isTranslationSame = leftTranslation.equals(rightTranslation) ? "相同" : "不相同";
 

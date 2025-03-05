@@ -22,6 +22,7 @@ public class Main {
             if(StringUtils.isNotEmpty(deal_fun)) {
                 switch (deal_fun) {
                     case "wlh": new ChineseToEnglishTranslator().writeTranslatorExcel(args_map); break;  //物理化翻译
+                    case "ddl": new SqlTemplateFiller().genDdlSql(args_map); break;  //ddl建表语句生成
                     case "zb": new IndexExcelWrite().writeIndexExcel(args_map); break;  //风控指标翻译
                     case "cf": new ExcelSheetSplitter().splitExcelSheets(args_map); break;  //拆分EXCEL
                     case "hb": new ExcelMerger().mergeExcelFiles(args_map); break;  //合并EXCEL

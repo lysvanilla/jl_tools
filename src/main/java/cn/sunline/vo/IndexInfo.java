@@ -1,9 +1,13 @@
 package cn.sunline.vo;
 
 import cn.idev.excel.annotation.ExcelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class IndexInfo {
     @ExcelProperty("序号")
     private String serialNumber;

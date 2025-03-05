@@ -1,9 +1,13 @@
 package cn.sunline.vo;
 
 import cn.idev.excel.annotation.ExcelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TranslationResultFull {
     // 中文原文
     @ExcelProperty("中文")
@@ -45,19 +49,4 @@ public class TranslationResultFull {
     @ExcelProperty("翻译是否相同")
     private String isTranslationSame;
 
-    public TranslationResultFull() {
-    }
-
-    public TranslationResultFull(String chinese, String leftTranslation, String leftSplitWords, String leftUnmatchedWords, String isLeftUnmatchedWords, String rightTranslation, String rightSplitWords, String rightUnmatchedWords, String isRightUnmatchedWords, String isTranslationSame) {
-        this.chinese = chinese;
-        this.leftTranslation = leftTranslation;
-        this.leftSplitWords = leftSplitWords;
-        this.leftUnmatchedWords = leftUnmatchedWords;
-        this.isLeftUnmatchedWords = isLeftUnmatchedWords;
-        this.rightTranslation = rightTranslation;
-        this.rightSplitWords = rightSplitWords;
-        this.rightUnmatchedWords = rightUnmatchedWords;
-        this.isRightUnmatchedWords = isRightUnmatchedWords;
-        this.isTranslationSame = isTranslationSame;
-    }
 }

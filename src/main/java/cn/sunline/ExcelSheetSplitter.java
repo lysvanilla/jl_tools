@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class ExcelSheetSplitter {
     private static final String basicExportPath = BasicInfo.getBasicExportPath("模型拆分");
     public static void main(String[] args) {
-        String inputFilePath = "D:\\svn\\jilin\\02.需求分析\\模板_吉林银行_风险数据集市逻辑设计文档-v0.1.xlsx";
+        String inputFilePath = "C:\\Users\\lysva\\Desktop\\吉林银行风险集市项目_基础模型层映射(合并)v1.1.xlsx";
         try {
             splitExcelSheets(inputFilePath);
             System.out.println("拆分完成！");
@@ -40,7 +40,7 @@ public class ExcelSheetSplitter {
         }
         try (FileInputStream fis = new FileInputStream(inputFilePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
-
+            int dealCount = workbook.getNumberOfSheets();
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
                 String sheetName = sheet.getSheetName();
@@ -53,7 +53,7 @@ public class ExcelSheetSplitter {
                 String outputFilePath = basicExportPath + sheetName + ".xlsx";
                 try (FileOutputStream fos = new FileOutputStream(outputFilePath)) {
                     newWorkbook.write(fos);
-                    log.info("Sheet [{}] 拆分成功 [{}]", sheetName, outputFilePath);
+                    log.info("[{}/{}]，Sheet [{}] 拆分成功 [{}]",i+1,dealCount, sheetName, outputFilePath);
                 }
                 newWorkbook.close();
             }

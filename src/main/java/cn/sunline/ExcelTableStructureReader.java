@@ -13,9 +13,9 @@ import java.util.List;
 public class ExcelTableStructureReader {
 
     public static void main(String[] args) {
-        String filePath = "D:\\BaiduSyncdisk\\工作目录\\项目\\202501-吉林银行风险集市\\物理模型模板.xlsx";
+        String filePath = "D:\\svn\\jilin\\03.模型设计\\风险数据集市物理模型-模板.xlsx";
         LinkedHashMap<String, TableStructure> tableMap = ExcelTableStructureReader.readExcel(filePath);
-        tableMap.get("kdpa_zhxinx").getFields().forEach(System.out::println);
+        tableMap.get("F_MKT_BOND_PRD_INFO").getFields().forEach(System.out::println);
         System.out.println("1");
     }
 

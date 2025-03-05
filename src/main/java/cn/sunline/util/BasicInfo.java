@@ -29,6 +29,7 @@ public class BasicInfo {
     public static String globarConfigPath = workspacePath+"/config/";
     public static String currentDate = DateUtil.format(DateUtil.date(),"YYYYMMdd");
     public static String dist_suffix = DateUtil.format(DateUtil.date(),"MMdd_HHmmss");;
+    public static Setting template_setting = new Setting(globarConfigPath+ "template_config.txt");
     //public static final Log log = LogFactory.get("service_log");
 
     public static void main(String[] args) {
