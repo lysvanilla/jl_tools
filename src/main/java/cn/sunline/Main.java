@@ -3,35 +3,77 @@ package cn.sunline;
 import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
-
 import static cn.sunline.util.ArgsUtil.parseArgs;
-
 
 @Slf4j
 public class Main {
+    private static final String VERSION = "202503050907";
+
     public static void main(String[] args) {
-        String version="202503050907";
-        System.out.println("当前编译版本："+version);
-        if(args.length == 0 || args[0].equalsIgnoreCase("help")){
-            System.out.println(BasicInfo.help_file);  //输出帮助说明
-        }else{
-            HashMap<String,String> args_map = parseArgs(args);
-            String deal_fun = args_map.get("f");
-            if(StringUtils.isNotEmpty(deal_fun)) {
-                switch (deal_fun) {
-                    case "wlh": new ChineseToEnglishTranslator().writeTranslatorExcel(args_map); break;  //物理化翻译
-                    case "ddl": new SqlTemplateFiller().genDdlSql(args_map); break;  //ddl建表语句生成
-                    case "zb": new IndexExcelWrite().writeIndexExcel(args_map); break;  //风控指标翻译
-                    case "cf": new ExcelSheetSplitter().splitExcelSheets(args_map); break;  //拆分EXCEL
-                    case "hb": new ExcelMerger().mergeExcelFiles(args_map); break;  //合并EXCEL
-                    default: System.out.println("输入的命令不支持，目前只支持下述操作：\n"+BasicInfo.help_file);
-                }
-            }else{
-                log.error("未输入f参数，该参数必输，目前支持下述操作：\n"+BasicInfo.help_file);
-                //System.out.println("未输入f参数，该参数必输，目前支持下述操作：\n"+BasicInfo.help_file);
-            }
+        // 输出当前编译版本
+        log.info("当前编译版本：{}", VERSION);
+
+        // 处理无参数或 help 参数的情况
+        if (args.length == 0 || isHelpArgument(args[0])) {
+            printHelpInfo();
+            return;
+        }
+
+        // 解析命令行参数
+        HashMap<String, String> argsMap = parseArgs(args);
+        String dealFun = argsMap.get("f");
+
+        // 检查是否提供了 f 参数
+        if (StringUtils.isEmpty(dealFun)) {
+            log.error("未输入 f 参数，该参数必输，目前支持下述操作：\n{}", BasicInfo.HELP_FILE);
+            return;
+        }
+
+        // 根据 f 参数的值执行相应的操作
+        executeOperation(dealFun, argsMap);
+    }
+
+    /**
+     * 检查输入的参数是否为 help
+     * @param arg 输入的参数
+     * @return 如果是 help 返回 true，否则返回 false
+     */
+    private static boolean isHelpArgument(String arg) {
+        return arg.equalsIgnoreCase("help");
+    }
+
+    /**
+     * 打印帮助信息
+     */
+    private static void printHelpInfo() {
+        System.out.println(BasicInfo.HELP_FILE);
+    }
+
+    /**
+     * 根据处理函数名执行相应的操作
+     * @param dealFun 处理函数名
+     * @param argsMap 命令行参数映射
+     */
+    private static void executeOperation(String dealFun, HashMap<String, String> argsMap) {
+        switch (dealFun) {
+            case "wlh":
+                new ChineseToEnglishTranslator().writeTranslatorExcel(argsMap);
+                break;
+            case "ddl":
+                new SqlTemplateFiller().genDdlSql(argsMap);
+                break;
+            case "zb":
+                new IndexExcelWrite().writeIndexExcel(argsMap);
+                break;
+            case "cf":
+                new ExcelSheetSplitter().splitExcelSheets(argsMap);
+                break;
+            case "hb":
+                new ExcelMerger().mergeExcelFiles(argsMap);
+                break;
+            default:
+                log.error("输入的命令不支持，目前只支持下述操作：\n{}", BasicInfo.HELP_FILE);
         }
     }
 }

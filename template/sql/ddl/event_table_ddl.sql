@@ -1,7 +1,7 @@
 /*
 Purpose:    快照/流水表建表脚本，此脚本由生成引擎自动生成。
 Author:     Sunline
-CreateDate: 20180515
+CreateDate: 20250305
 FileType:   DDL
 Logs:
     sunlinedata 2025-03-05 新建脚本

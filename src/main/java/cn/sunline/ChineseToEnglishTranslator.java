@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 // 定义一个中文到英文的翻译器类
 public class ChineseToEnglishTranslator {
 
-    private static final String tpl_path = BasicInfo.tpl_path+"excel"+File.separator+"物理化翻译模板.xlsx";
+    private static final String tpl_path = BasicInfo.TPL_PATH+"excel"+File.separator+"物理化翻译模板.xlsx";
     private static HashMap<String, String> translationDict = LexiconInfoReader.convertListToMap(tpl_path);
     private static final String basicExportPath = BasicInfo.getBasicExportPath("");
     private static LinkedHashMap<String, SplitWordsFailure> splitWordsFailureMap = new LinkedHashMap<>();
@@ -72,7 +72,7 @@ public class ChineseToEnglishTranslator {
         List<TranslationResultFull> chineseList = translator.translateChineseMain(filePath);
         String fileName = FileUtil.mainName(filePath);
         String extFileName = FileUtil.extName(filePath);
-        writeExcel(chineseList,tpl_path,basicExportPath+fileName+"-翻译结果"+BasicInfo.currentDate+"."+extFileName);
+        writeExcel(chineseList,tpl_path,basicExportPath+fileName+"-翻译结果"+BasicInfo.CURRENT_DATE+"."+extFileName);
     }
 
     public static void writeExcel(List<TranslationResultFull> translationResultFullList, String templatePath, String outputPath) {
