@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>5.2.3</version>
@@ -35,11 +40,6 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.17.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
             <version>2.17.2</version>
         </dependency>
         <!-- SLF4J 与 Log4j2 桥接依赖 -->
@@ -80,60 +80,40 @@
         </dependency>
     </dependencies>
 
-  <!--  &lt;!&ndash; 构建配置 &ndash;&gt;
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                &lt;!&ndash; 指定主类 &ndash;&gt;
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>cn.sunline.Main</mainClass>
-                                </transformer>
-                                &lt;!&ndash; 处理服务配置文件合并 &ndash;&gt;
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>-->
 
-    <!-- 构建配置 -->
     <build>
+        <!-- 配置资源目录 -->
+        <resources>
+            <!-- 默认资源目录 -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- 包含 config 目录 -->
+            <resource>
+                <directory>config</directory>
+                <targetPath>${project.build.directory}/config</targetPath>
+            </resource>
+            <!-- 包含 template 目录 -->
+            <resource>
+                <directory>template</directory>
+                <targetPath>${project.build.directory}/template</targetPath>
+            </resource>
+        </resources>
         <plugins>
+            <!-- 配置 maven-resources-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <!-- 指定入口函数 -->
-                            <mainClass>cn.sunline.Main</mainClass>
-                            <!-- 是否添加依赖的jar路径配置 -->
-                            <addClasspath>true</addClasspath>
-                            <!-- 依赖的jar包存放未知，和生成的jar放在同一级目录下 -->
-                            <classpathPrefix>libs/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                    <!-- 不打包com.yh.excludes下面的所有类 -->
-                    <!--<excludes>com/xx/excludes/*</excludes>-->
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <!-- 配置 maven-dependency-plugin 复制依赖到 target/libs 目录 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -142,55 +122,30 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/libs</outputDirectory>
-                            <!--<excludeTransitive>false</excludeTransitive>-->
-                            <!--<stripVersion>true</stripVersion>-->
+                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <!-- 配置 maven-jar-plugin 生成可执行 JAR 包 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.7.1</version>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <!-- 绑定到package生命周期 -->
-                        <phase>package</phase>
-                        <goals>
-                            <!-- 只运行一次 -->
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- 指定入口函数 -->
-                            <mainClass>cn.sunline.Main</mainClass>
-                            <!-- 是否添加依赖的jar路径配置 -->
                             <addClasspath>true</addClasspath>
-                            <!-- 依赖的jar包存放未知，和生成的jar放在同一级目录下 -->
                             <classpathPrefix>libs/</classpathPrefix>
+                            <mainClass>cn.sunline.Main</mainClass> <!-- 替换为你的主类全限定名 -->
                         </manifest>
-                        <manifestEntries>
-                            <Class-Path>./</Class-Path>
-                        </manifestEntries>
                     </archive>
-                    <!-- 配置描述符文件 -->
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                    <!-- 也可以使用Maven预配置的描述符-->
-                    <!--<descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>-->
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 
 
 </project>

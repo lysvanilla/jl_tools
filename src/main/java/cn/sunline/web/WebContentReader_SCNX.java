@@ -1,16 +1,16 @@
-package cn.sunline;
+package cn.sunline.web;
 import cn.hutool.http.HttpUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class WebContentReader {
+public class WebContentReader_SCNX {
 
+    //四川农信 http://www.scrcu.com/other/zbcg/
     public static Map<String, String> extractLinksFromPage(String url) {
         Map<String, String> linkMap = new LinkedHashMap<>();
         try {
