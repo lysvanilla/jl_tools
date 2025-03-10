@@ -1,1 +1,10 @@
 ddl_ev_i_tpl=/sql/ddl/event_table_ddl.sql
+
+
+基础模型层=pm_ridata
+计量模型层=pm_ridata
+接口模型层=pm_ridata
+
+F=pm_ridata
+M=pm_ridata
+A=pm_ridata

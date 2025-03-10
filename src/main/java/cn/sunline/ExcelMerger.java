@@ -1,9 +1,11 @@
 package cn.sunline;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
+import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -13,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,6 +27,8 @@ import java.util.Set;
 public class ExcelMerger {
     // 定义合并后文件的基础导出路径
     private static final String basicExportPath = BasicInfo.getBasicExportPath("");
+    // 用于缓存已经创建的样式
+    private static Map<CellStyle, CellStyle> styleCache = new HashMap<>();
 
     /**
      * 程序的入口方法，用于测试 Excel 文件合并功能。
@@ -32,10 +37,8 @@ public class ExcelMerger {
      */
     public static void main(String[] args) {
         // 定义输入的文件夹路径
-        String inputDirectory = "D:\\吉林银行\\risk_20250305\\模型拆分空白";
+        String inputDirectory = "D:\\svn\\jilin\\04.映射设计\\0401.基础模型层";
         try {
-            // 调整最小压缩率限制，防止因压缩率问题导致文件读取失败
-            ZipSecureFile.setMinInflateRatio(0.001);
             // 记录开始合并 Excel 文件的日志
             log.info("开始合并 Excel 文件，输入文件夹路径：[{}]", inputDirectory);
             // 调用合并方法进行文件合并
@@ -55,10 +58,10 @@ public class ExcelMerger {
      */
     public void mergeExcelFiles(HashMap<String, String> args_map) {
         // 从参数映射中获取文件夹路径
-        String file_path = args_map.get("file_path");
+        String file_path = args_map.get("file_name");
         if (file_path == null) {
             // 若路径为空，记录错误日志
-            log.error("参数映射中未包含 'file_path'，无法进行 Excel 文件合并");
+            log.error("参数映射中未包含 'file_name'，无法进行 Excel 文件合并");
             return;
         }
         try {
@@ -96,6 +99,8 @@ public class ExcelMerger {
             log.error("输入的文件夹是一个空目录：[{}]", inputDirectory);
             return;
         }
+        // 调整最小压缩率限制，防止因压缩率问题导致文件读取失败
+        ZipSecureFile.setMinInflateRatio(0);
 
         // 创建一个新的工作簿用于合并文件
         Workbook mergedWorkbook = new XSSFWorkbook();
@@ -109,7 +114,7 @@ public class ExcelMerger {
         if (files != null) {
             // 遍历文件夹下的所有文件
             for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".xlsx")) {
+                if (file.isFile() && file.getName().endsWith(".xlsx") && !file.getName().startsWith("~")) {
                     try (FileInputStream fis = new FileInputStream(file);
                          Workbook workbook = new XSSFWorkbook(fis)) {
                         // 获取文件名（不包含扩展名）
@@ -124,7 +129,7 @@ public class ExcelMerger {
                                 // 若存在同名工作表，记录警告日志
                                 log.warn("[{}]发现同名工作表 [{}]，将添加后缀以区分", fileName, sheetName);
                                 // 为同名工作表添加后缀
-                                sheetName = sheetName + BasicInfo.DIST_SUFFIX;
+                                sheetName = sheetName + DateUtil.format(DateUtil.date(), "MMdd_HHmmss");
                             }
                             // 将新的工作表名称添加到集合中
                             sheetNames.add(sheetName);
@@ -192,6 +197,8 @@ public class ExcelMerger {
             destinationSheet.setColumnWidth(i, sourceSheet.getColumnWidth(i));
         }
 
+
+
         // 遍历源工作表的每一行
         for (int i = 0; i <= lastRowNum; i++) {
             Row sourceRow = sourceSheet.getRow(i);
@@ -210,10 +217,22 @@ public class ExcelMerger {
                     if (sourceCell != null) {
                         // 在目标行中创建对应的单元格
                         Cell destinationCell = destinationRow.createCell(j);
-                        // 创建新的单元格样式
-                        CellStyle newCellStyle = newWorkbook.createCellStyle();
-                        // 复制源单元格的样式到新样式
-                        newCellStyle.cloneStyleFrom(sourceCell.getCellStyle());
+
+                        // 获取源单元格的样式
+                        CellStyle sourceCellStyle = sourceCell.getCellStyle();
+
+                        // 生成样式的关键属性字符串
+                        //String styleKey = getStyleKey(sourceCellStyle);
+
+                        // 检查缓存中是否已经存在相同的样式
+                        CellStyle newCellStyle = styleCache.get(sourceCellStyle);
+                        if (newCellStyle == null) {
+                            // 如果不存在，则创建新的样式并添加到缓存中
+                            newCellStyle = newWorkbook.createCellStyle();
+                            newCellStyle.cloneStyleFrom(sourceCellStyle);
+                            styleCache.put(sourceCellStyle, newCellStyle);
+                        }
+
                         // 设置目标单元格的样式为新样式
                         destinationCell.setCellStyle(newCellStyle);
 
@@ -229,7 +248,15 @@ public class ExcelMerger {
                                 destinationCell.setCellValue(sourceCell.getBooleanCellValue());
                                 break;
                             case FORMULA:
-                                destinationCell.setCellFormula(sourceCell.getCellFormula());
+                                try {
+                                    // 尝试设置公式
+                                    destinationCell.setCellFormula(sourceCell.getCellFormula());
+                                } catch (FormulaParseException e) {
+                                    // 处理公式解析异常，这里简单记录日志并忽略公式
+                                    log.error("复制公式时发生错误，公式: [{}]", sourceCell.getCellFormula(), e);
+                                    // 可以选择将公式结果作为值复制
+                                    //destinationCell.setCellValue(sourceCell.getStringCellValue());
+                                }
                                 break;
                             default:
                                 break;
@@ -240,5 +267,24 @@ public class ExcelMerger {
         }
         // 记录工作表复制完成的日志
         log.info("工作表复制完成");
+    }
+
+    /**
+     * 生成样式的关键属性字符串
+     * @param style 单元格样式
+     * @return 样式的关键属性字符串
+     */
+    private static String getStyleKey(CellStyle style) {
+        StringBuilder key = new StringBuilder();
+        key.append(style.getAlignment().name());
+        key.append(style.getVerticalAlignment().name());
+        key.append(style.getBorderTop().name());
+        key.append(style.getBorderRight().name());
+        key.append(style.getBorderBottom().name());
+        key.append(style.getBorderLeft().name());
+        key.append(style.getFillForegroundColor());
+        key.append(style.getFillPattern().name());
+        key.append(style.getFontIndexAsInt());
+        return key.toString();
     }
 }

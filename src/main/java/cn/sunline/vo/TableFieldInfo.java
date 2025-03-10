@@ -82,4 +82,7 @@ public class TableFieldInfo {
     @ExcelProperty("更新人")
     private String updatePerson;
 
+    @ExcelProperty("来源字段英文名")
+    private String sourceFieldNameEn;
+
 }

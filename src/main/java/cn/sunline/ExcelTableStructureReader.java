@@ -131,7 +131,9 @@ public class ExcelTableStructureReader {
                 }
             }
             // 记录字段信息添加完成的日志，包含未匹配到表结构的字段信息数量
-            log.info("字段信息添加完成，共有 [{}] 条字段信息未找到对应的表结构", unmatchedCount);
+            if (unmatchedCount>0){
+                 log.warn("字段信息添加完成，共有 [{}] 条字段信息未找到对应的表结构", unmatchedCount);
+            }
 
         } catch (Exception e) {
             // 捕获并记录读取文件过程中出现的异常信息

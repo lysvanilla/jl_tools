@@ -28,6 +28,7 @@ public class ExcelSheetSplitter {
     public static void main(String[] args) {
         // 定义输入的 Excel 文件路径
         String inputFilePath = "C:\\Users\\lysva\\Desktop\\吉林银行风险集市项目_基础模型层映射(合并)v1.1.xlsx";
+        inputFilePath = "D:\\svn\\jilin\\98.个人资料\\王萍\\吉林银行风险集市项目_风险计量层数据映射v1.0.xlsx";
         try {
             // 记录开始进行 Excel 工作表拆分的日志，包含输入文件路径
             log.info("开始进行 Excel 工作表拆分，输入文件路径：[{}]", inputFilePath);

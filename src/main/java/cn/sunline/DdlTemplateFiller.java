@@ -12,15 +12,19 @@ import java.util.*;
 
 import static cn.sunline.util.BasicInfo.TEMPLATE_SETTING;
 import static cn.sunline.util.GetTemplateInfo.getCircleLine;
+import static cn.sunline.util.GetTemplateInfo.removeFirstOccurence;
 
 /**
  * SqlTemplateFiller 类用于根据 Excel 文件中的表结构信息生成 DDL SQL 语句。
  * 它会读取 Excel 文件，获取表结构信息，然后根据模板填充数据，最终生成 DDL SQL 文件。
  */
 @Slf4j
-public class SqlTemplateFiller {
+public class DdlTemplateFiller {
     // 定义导出文件的基础路径，通过 BasicInfo 类的方法获取
-    public static final String base_export_path = BasicInfo.getBasicExportPath("autocode");
+    public static final String base_export_path = BasicInfo.getBasicExportPath("autocode/ddl");
+    public static final String base_export_insert_path = BasicInfo.getBasicExportPath("autocode/insert");
+    public static final String base_export_dml_path = BasicInfo.getBasicExportPath("autocode/dml_a");
+    private static final String INSERT_TPL_PATH = BasicInfo.TPL_PATH + "sql/ddl/insert_sql.sql";
 
     /**
      * 程序入口方法，用于测试生成 DDL SQL 语句的功能。
@@ -30,8 +34,10 @@ public class SqlTemplateFiller {
     public static void main(String[] args) {
         // 定义 Excel 文件的路径
         String filePath = "D:\\svn\\jilin\\03.模型设计\\风险数据集市物理模型-模板.xlsx";
+        filePath = "D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx";
         // 调用 genDdlSql 方法生成 DDL SQL 语句
-        genDdlSql(filePath);
+        genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx");
+        genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-接口层.xlsx");
     }
 
     /**
@@ -84,16 +90,35 @@ public class SqlTemplateFiller {
             String systemModule = StringUtils.lowerCase(tableStructure.getSystemModule());
             // 将表英文名转换为小写
             String tableNameEn = StringUtils.lowerCase(tableStructure.getTableNameEn());
+            String srcTableNameEn = "m"+tableNameEn.substring(1);
             // 将表中文名转换为小写
             String tableNameCn = StringUtils.lowerCase(tableStructure.getTableNameCn());
 
             try {
+                // 获取模板文件名
+                String tplFileName = BasicInfo.TPL_PATH + getTplName("ddl", tableStructure.getAlgorithmType());
                 // 调用 fillTemplate 方法填充模板，生成 DDL SQL 语句
-                String filledSql = fillTemplate(tableStructure);
+                String filledSql = fillTemplate(tableStructure,tplFileName);
                 // 定义导出文件的路径
-                String outputPath = base_export_path + "create_table_" + tableNameEn + "_.sql";
+                String outputPath = base_export_path + "create_table_" + tableNameEn + ".sql";
                 // 将生成的 DDL SQL 语句写入文件
                 FileUtil.writeString(filledSql, outputPath, "UTF-8");
+
+                // 调用 fillTemplate 方法填充模板，生成 Insert SQL 语句
+                String insertSql = fillTemplate(tableStructure,INSERT_TPL_PATH);
+
+                // 定义导出文件的路径
+                String outputInsertPath = base_export_insert_path +"insert_"+ tableNameEn + ".sql";
+                // 将生成的 DDL SQL 语句写入文件
+                FileUtil.writeString(insertSql, outputInsertPath, "UTF-8");
+
+                if (tableNameEn.startsWith("a")){
+                    String outputAmlPath = base_export_dml_path + tableNameEn + ".sql";
+                    // 将生成的 DDL SQL 语句写入文件
+                    FileUtil.writeString(insertSql, outputAmlPath, "UTF-8");
+                }
+
+
                 // 记录成功日志
                 log.info("ddl建表语句生成功[{}]-[{}]，输出文件路径: [{}]", tableNameEn, tableNameCn, outputPath);
             } catch (Exception e) {
@@ -109,31 +134,48 @@ public class SqlTemplateFiller {
      * @param tableStructure 表结构信息对象
      * @return 填充后的 DDL SQL 语句
      */
-    public static String fillTemplate(TableStructure tableStructure) {
+    public static String fillTemplate(TableStructure tableStructure,String tplFileName) {
         // 获取模板文件名
-        String tplFileName = getTplName("ddl", tableStructure.getAlgorithmType());
+        /*String tplFileNameQry = getTplName("ddl", tableStructure.getAlgorithmType());
+        if (StringUtils.isBlank(tplFileName)){
+            tplFileName = tplFileNameQry;
+        }*/
         // 检查模板文件名是否为空
-        if (StringUtils.isEmpty(tplFileName)) {
+        if (!FileUtil.exist(tplFileName)) {
             // 若为空，记录错误日志
             log.error("未找到合适的SQL模板，无法生成DDL语句");
             return "";
         }
-        // 拼接模板文件的完整路径
-        String tplFilePath = BasicInfo.TPL_PATH + tplFileName;
         // 读取模板文件内容
-        String tplInfo = new FileReader(tplFilePath).readString();
+        String tplInfo = new FileReader(tplFileName).readString();
         // 获取模板文件中的循环行信息
-        List<String> circleLineList = getCircleLine(tplFilePath);
+        List<String> circleLineList = getCircleLine(tplFileName);
         // 获取表英文名
         String tableNameEn = tableStructure.getTableNameEn();
+        String tableNameEnLower = StringUtils.lowerCase(tableNameEn);
+        String sourceTableNameEn = tableStructure.getSourceTableNameEn();
+        String sourceTableNameEnLower = StringUtils.defaultString(StringUtils.lowerCase(sourceTableNameEn),"");
         // 获取表中文名
         String tableNameCn = tableStructure.getTableNameCn();
+        // 将系统模块名转换为小写
+        String systemModule = tableStructure.getSystemModule();
+        // 设计人员
+        String designer = StringUtils.defaultString(tableStructure.getDesigner(),"");
+        //上线时间
+        String onlineTime = StringUtils.defaultString(tableStructure.getOnlineTime(),"");
         // 获取表的字段信息
         LinkedHashMap<String, TableFieldInfo> fieldMap = tableStructure.getFieldMap();
 
+        String tableSchema = TEMPLATE_SETTING.get(systemModule);
+        if (StringUtils.isBlank(tableSchema)){
+            log.error("归属层次[{}]未在配置对应的schema",systemModule);
+            tableSchema  = "未配置";
+        }
+
         // 替换模板中的表英文名和表中文名
-        String exportSql = tplInfo.replace("${table_name_en}", tableNameEn)
-                .replace("${table_name_cn}", tableNameCn);
+        String exportSql = tplInfo.replace("${table_name_en}", tableNameEn).replace("${table_name_en_lower}", tableNameEnLower)
+                .replace("${table_name_cn}", tableNameCn).replace("${table_schema}", tableSchema).replace("${mapping_analyst}", designer)
+                .replace("${create_time}", onlineTime).replace("${src_table_name_en_lower}", sourceTableNameEnLower);
 
         // 存储分桶键的列表
         List<String> bucketKeys = new ArrayList<>();
@@ -173,6 +215,9 @@ public class SqlTemplateFiller {
                     String notNull = StringUtils.lowerCase(tableFieldInfo.getNotNull());
                     // 根据字段是否非空标识生成相应的 SQL 语句
                     String ifNull = "Y".equals(notNull) ? "not null" : "default null";
+                    // 来源字段英文名
+                    String sourceFieldNameEn = StringUtils.defaultString(StringUtils.lowerCase(tableFieldInfo.getSourceFieldNameEn()),fieldNameEn);
+
 
                     // 复制循环行模板
                     String circleLine = circleLineTpl;
@@ -180,6 +225,8 @@ public class SqlTemplateFiller {
                     circleLine = circleLine.replaceAll("\\@\\{column_name_en}", ReUtil.escape(StringUtils.defaultString(fieldNameEn, "")))
                             // 替换循环行模板中的字段中文名
                             .replaceAll("\\@\\{column_name_cn}", ReUtil.escape(StringUtils.defaultString(fieldNameCn, "")))
+                            // 替换循环行模板中的字段中文名
+                            .replaceAll("\\@\\{src_column_name_en}", ReUtil.escape(StringUtils.defaultString(sourceFieldNameEn, "")))
                             // 替换循环行模板中的字段类型
                             .replaceAll("\\@\\{column_type}", ReUtil.escape(StringUtils.defaultString(fieldType, "")))
                             // 替换循环行模板中的字段是否非空信息
@@ -190,6 +237,7 @@ public class SqlTemplateFiller {
                 }
                 // 将替换后的循环行列表拼接成字符串
                 String circleLineInfo = String.join("\n", circleLineReplaceList);
+                circleLineInfo = removeFirstOccurence(circleLineInfo, ',');
                 // 替换模板中的循环行
                 exportSql = exportSql.replaceAll(ReUtil.escape(circleLineTpl), ReUtil.escape(circleLineInfo));
             }

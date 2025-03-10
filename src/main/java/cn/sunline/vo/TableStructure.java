@@ -45,6 +45,8 @@ public class TableStructure {
     private String publicStatus;
     @ExcelProperty("来源系统")
     private String sourceSystem;
+    @ExcelProperty("来源表")
+    private String sourceTableNameEn;
     @ExcelProperty("设计人员")
     private String designer;
     @ExcelProperty("状态")

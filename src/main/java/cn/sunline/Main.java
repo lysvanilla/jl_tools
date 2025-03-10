@@ -1,5 +1,8 @@
 package cn.sunline;
 
+import cn.sunline.mapping.BatchUpdateMappExcel;
+import cn.sunline.mapping.DmlTemplateFiller;
+import cn.sunline.mapping.TableToEtlMapp;
 import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +64,16 @@ public class Main {
                 new ChineseToEnglishTranslator().writeTranslatorExcel(argsMap);
                 break;
             case "ddl":
-                new SqlTemplateFiller().genDdlSql(argsMap);
+                new DdlTemplateFiller().genDdlSql(argsMap);
+                break;
+            case "dml":
+                new DmlTemplateFiller().genDmlSqlMain(argsMap);
+                break;
+            case "update_mapp":
+                new BatchUpdateMappExcel().batchUpdateMappExcelMain(argsMap);
+                break;
+            case "gen_mapp":
+                new TableToEtlMapp().tableToEtlMapp(argsMap);
                 break;
             case "zb":
                 new IndexExcelWrite().writeIndexExcel(argsMap);

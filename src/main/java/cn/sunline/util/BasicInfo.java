@@ -92,7 +92,7 @@ public class BasicInfo {
         // 创建导出路径对应的目录
         FileUtil.mkdir(export_file_path);
         // 记录导出路径信息
-        log.info("生成的导出路径为: {}", export_file_path);
+        log.debug("生成的导出路径为: {}", export_file_path);
         return export_file_path;
     }
 

@@ -74,7 +74,7 @@ public class GetTemplateInfo {
                 }
             }
             // 记录成功从文件中提取到的包含 '@' 符号的行的数量
-            log.info("从文件 [{}] 中成功提取到 [{}] 条包含 '@' 的行", fileName, circleLineList.size());
+            //log.info("从文件 [{}] 中成功提取到 [{}] 条包含 '@' 的行", fileName, circleLineList.size());
         } catch (Exception e) {
             // 若读取文件过程中出现异常，记录错误信息
             log.error("读取文件 [{}] 时发生异常: {}", fileName, e.getMessage(), e);
