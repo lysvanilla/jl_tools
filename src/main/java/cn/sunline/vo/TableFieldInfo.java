@@ -46,6 +46,12 @@ public class TableFieldInfo {
     @ExcelProperty("字段类型")
     private String fieldType;
 
+    @ExcelProperty("分区字段")
+    private String partKey;
+
+    @ExcelProperty("建表类型")
+    private String tableCreationType;
+
     @ExcelProperty("外键")
     private String foreignKey;
 
