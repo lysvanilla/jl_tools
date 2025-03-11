@@ -1,4 +1,4 @@
-package cn.sunline;
+package cn.sunline.index;
 
 import cn.idev.excel.FastExcel;
 import cn.sunline.vo.IndexInfo;

@@ -1,6 +1,6 @@
 package cn.sunline.mapping;
 
-import cn.sunline.ExcelTableStructureReader;
+import cn.sunline.table.ExcelTableStructureReader;
 import cn.sunline.vo.TableFieldInfo;
 import cn.sunline.vo.TableStructure;
 import cn.sunline.vo.etl.EtlGroup;

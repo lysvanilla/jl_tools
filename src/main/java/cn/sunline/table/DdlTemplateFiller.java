@@ -1,4 +1,4 @@
-package cn.sunline;
+package cn.sunline.table;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;

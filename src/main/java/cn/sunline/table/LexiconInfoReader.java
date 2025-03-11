@@ -1,4 +1,4 @@
-package cn.sunline;
+package cn.sunline.table;
 
 import cn.idev.excel.FastExcel;
 import cn.sunline.vo.LexiconInfo;
