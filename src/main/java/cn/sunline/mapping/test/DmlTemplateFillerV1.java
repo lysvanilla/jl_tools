@@ -1,4 +1,4 @@
-package cn.sunline.mapping;
+package cn.sunline.mapping.test;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;

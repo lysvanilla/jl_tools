@@ -61,9 +61,11 @@ public class TableStructure {
     // 非Excel映射属性
     private List<TableFieldInfo> fields;
     private LinkedHashMap<String, TableFieldInfo> fieldMap;
+    private LinkedHashMap<String, TableFieldInfo> fieldCnMap;
 
     public TableStructure() {
         this.fieldMap = new LinkedHashMap<>();
+        this.fieldCnMap = new LinkedHashMap<>();
     }
 
     public void addField(TableFieldInfo field) {
@@ -72,6 +74,7 @@ public class TableStructure {
         }
         fields.add(field);
         fieldMap.put(field.getFieldNameEn(), field);
+        fieldCnMap.put(field.getFieldNameCn(), field);
     }
 
 

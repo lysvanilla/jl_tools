@@ -73,7 +73,7 @@ public class ExcelTableStructureReader {
 
         try {
             // 记录开始从 "表级信息" 工作表读取表基本信息的日志
-            log.info("开始从文件 [{}] 的 '表级信息' 工作表读取表基本信息", filePath);
+            log.debug("开始从文件 [{}] 的 '表级信息' 工作表读取表基本信息", filePath);
             // 读取表基本信息
             List<TableStructure> tableStructures = FastExcel.read(file)
                     .sheet("表级信息")
@@ -87,7 +87,7 @@ public class ExcelTableStructureReader {
             log.info("成功从 '表级信息' 工作表读取到 [{}] 条表基本信息", tableStructures.size());
 
             // 记录开始从 "字段级信息" 工作表读取字段信息的日志
-            log.info("开始从文件 [{}] 的 '字段级信息' 工作表读取字段信息", filePath);
+            log.debug("开始从文件 [{}] 的 '字段级信息' 工作表读取字段信息", filePath);
             // 读取字段信息
             List<TableFieldInfo> tableFieldInfos = FastExcel.read(file)
                     .sheet("字段级信息")
@@ -101,7 +101,7 @@ public class ExcelTableStructureReader {
             log.info("成功从 '字段级信息' 工作表读取到 [{}] 条字段信息", tableFieldInfos.size());
 
             // 记录开始将表基本信息放入 Map 的日志
-            log.info("开始将表基本信息放入 Map");
+            log.debug("开始将表基本信息放入 Map");
             for (TableStructure table : tableStructures) {
                 // 检查表的英文名称是否有效
                 if (table.getTableNameEn() != null && !table.getTableNameEn().trim().isEmpty()) {
@@ -113,7 +113,7 @@ public class ExcelTableStructureReader {
             log.info("成功将 [{}] 条表基本信息放入 Map", tableMap.size());
 
             // 记录开始将字段信息添加到对应表结构中的日志
-            log.info("开始将字段信息添加到对应的表结构中");
+            log.debug("开始将字段信息添加到对应的表结构中");
             int unmatchedCount = 0;
             for (TableFieldInfo field : tableFieldInfos) {
                 // 检查字段所属表的英文名称是否有效

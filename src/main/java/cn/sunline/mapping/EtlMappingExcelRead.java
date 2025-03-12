@@ -129,11 +129,12 @@ public class EtlMappingExcelRead {
             Row row = sheet.getRow(rowNum);
             if (row == null) continue;
             String targetFieldEnglishName = getCellValue(row, 2);   //字段英文名(*)
-            if (StringUtils.isBlank(targetFieldEnglishName)){
+            String targetTableChineseName = getCellValue(row, 1);  //字段中文名(*)
+            if (StringUtils.isBlank(targetFieldEnglishName) && StringUtils.isBlank(targetTableChineseName)){
                 continue;
             }
             EtlGroupColMapp etlGroupColMapp = new EtlGroupColMapp();
-            etlGroupColMapp.setTargetFieldChineseName(getCellValue(row, 1));  //字段中文名(*)
+            etlGroupColMapp.setTargetFieldChineseName(targetTableChineseName);  //字段中文名(*)
             etlGroupColMapp.setTargetFieldEnglishName(targetFieldEnglishName);  //字段英文名(*)
             etlGroupColMapp.setTargetFieldType(getCellValue(row, 3));  //字段类型
             etlGroupColMapp.setSourceTableSchema(getCellValue(row, 4));  //源表schema

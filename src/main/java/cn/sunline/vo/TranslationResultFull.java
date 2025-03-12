@@ -49,4 +49,7 @@ public class TranslationResultFull {
     @ExcelProperty("翻译是否相同")
     private String isTranslationSame;
 
+    @ExcelProperty("向左或向右缺词根")
+    private String isLeftOrRightUnmatchedWords;
+
 }

@@ -90,6 +90,7 @@ public class ChineseToEnglishTranslator {
                 WriteSheet split_sheet = FastExcel.writerSheet("词根缺失清单").build();
                 // 使用 Stream API 将 Map 中的值收集到 List 中
                 List<SplitWordsFailure> splitWordsFailureList = splitWordsFailureMap.values().stream()
+                        .peek(failure -> failure.setRelatedFieldsStr(String.join("\n", failure.getRelatedFields())))
                         .collect(Collectors.toCollection(ArrayList::new));
                 excelWriter.fill(splitWordsFailureList,split_sheet);
             }
@@ -232,21 +233,31 @@ public class ChineseToEnglishTranslator {
 
     public TranslationResultFull  translateChinese(String input){
         ChineseToEnglishTranslator translator = new ChineseToEnglishTranslator();
-
+        String result = removeSpecialCharacters(input);
         // 调用从左到右的翻译方法，得到翻译结果
-        TranslationResult leftToRightResult = translator.translateLeftToRight(input);
+        TranslationResult leftToRightResult = translator.translateLeftToRight(result);
         String leftTranslation = leftToRightResult.getTranslatedText();
         String leftSplitWords = leftToRightResult.getSplitWords();
         String leftUnmatchedWords = leftToRightResult.getUnmatchedWords();
         String isLeftUnmatchedWords = leftUnmatchedWords.isEmpty() ? "否" : "缺词根";
         if (StringUtils.isNotEmpty(leftUnmatchedWords)){
             List<String> splitWordsFailure = Arrays.asList(leftUnmatchedWords.toString().split("#"));
-            splitWordsFailure.forEach(element -> splitWordsRightFailureMap.put("向右缺词根"+element,new SplitWordsFailure(element,"向右缺词根")));
+            //splitWordsFailure.forEach(element -> splitWordsRightFailureMap.put("向右缺词根"+element,new SplitWordsFailure(element,"向右缺词根")));
+            splitWordsFailure.forEach(element -> {
+                String key = "向右缺词根" + element;
+                if (!splitWordsRightFailureMap.containsKey(key)) {
+                    SplitWordsFailure splitWordsFailure1 = new SplitWordsFailure(element, "向右缺词根");
+                    splitWordsFailure1.addRelatedField(input);
+                    splitWordsRightFailureMap.put(key, splitWordsFailure1);
+                }else{
+                    splitWordsRightFailureMap.get(key).addRelatedField(input);
+                }
+            });
         }
 
 
         // 调用从右到左的翻译方法，得到翻译结果
-        TranslationResult rightToLeftResult = translator.translateRightToLeft(input);
+        TranslationResult rightToLeftResult = translator.translateRightToLeft(result);
 
         String rightTranslation = rightToLeftResult.getTranslatedText();
         String rightSplitWords = rightToLeftResult.getSplitWords();
@@ -254,14 +265,31 @@ public class ChineseToEnglishTranslator {
         String isRightUnmatchedWords = rightUnmatchedWords.isEmpty() ? "否" : "缺词根";
         if (StringUtils.isNotEmpty(rightUnmatchedWords)){
             List<String> splitWordsFailure = Arrays.asList(rightUnmatchedWords.toString().split("#"));
-            splitWordsFailure.forEach(element -> splitWordsLeftFailureMap.put("向左缺词根"+element,new SplitWordsFailure(element,"向左缺词根")));
+            //splitWordsFailure.forEach(element -> splitWordsLeftFailureMap.put("向左缺词根"+element,new SplitWordsFailure(element,"向左缺词根")));
+            splitWordsFailure.forEach(element -> {
+                String key = "向右缺词根" + element;
+                if (!splitWordsLeftFailureMap.containsKey(key)) {
+                    SplitWordsFailure splitWordsFailure1 = new SplitWordsFailure(element, "向左缺词根");
+                    splitWordsFailure1.addRelatedField(input);
+                    splitWordsLeftFailureMap.put(key, splitWordsFailure1);
+                }else{
+                    splitWordsLeftFailureMap.get(key).addRelatedField(input);
+                }
+            });
         }
 
 
         String isTranslationSame = leftTranslation.equals(rightTranslation) ? "相同" : "不相同";
+        String isLeftOrRightUnmatchedWords = leftUnmatchedWords.isEmpty() && rightUnmatchedWords.isEmpty() ? "否" : "缺词根";
 
-        TranslationResultFull translationResultFull = new TranslationResultFull(input,leftTranslation,leftSplitWords,leftUnmatchedWords,isLeftUnmatchedWords,rightTranslation,rightSplitWords,rightUnmatchedWords,isRightUnmatchedWords,isTranslationSame);
+        TranslationResultFull translationResultFull = new TranslationResultFull(input,leftTranslation,leftSplitWords,leftUnmatchedWords,isLeftUnmatchedWords,rightTranslation,rightSplitWords,rightUnmatchedWords,isRightUnmatchedWords,isTranslationSame,isLeftOrRightUnmatchedWords);
 
         return translationResultFull;
     }
+
+    public static String removeSpecialCharacters(String input) {
+        // 使用正则表达式匹配除字母、数字和中文之外的所有字符并替换为空字符串
+        return input.replaceAll("[^a-zA-Z0-9\\u4e00-\\u9fa5]", "");
+    }
+
 }

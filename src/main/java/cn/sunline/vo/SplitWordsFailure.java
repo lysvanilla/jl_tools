@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,5 +20,20 @@ public class SplitWordsFailure {
     @ExcelProperty("拆解方式")
     private String decompositionMethod;
 
+    @ExcelProperty("关联字段")
+    private String relatedFieldsStr;
 
+    public SplitWordsFailure(String missingRoot, String decompositionMethod) {
+        this.missingRoot = missingRoot;
+        this.decompositionMethod = decompositionMethod;
+    }
+
+    private LinkedHashSet<String> relatedFields;
+
+    public void addRelatedField(String relatedField) {
+        if (relatedFields == null){
+            this.relatedFields = new LinkedHashSet<>();
+        }
+        this.relatedFields.add(relatedField);
+    }
 }

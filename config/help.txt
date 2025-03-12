@@ -7,3 +7,5 @@ Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=gen_table file_name="D:\svn\jili
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=zb file_name="D:\svn\jilin\02.需求分析\0202.智能风控系统\智能风控系统指标信息_20250304.xlsx"
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=cf file_name="D:\svn\jilin\02.需求分析\模板_吉林银行_风险数据集市逻辑设计文档-v0.1.xlsx"
 Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=hb file_name="D:\吉林银行\risk_20250305\模型拆分"
+Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=update_mapp file_name="D:\svn\jilin\04.映射设计\0402.计量模型层\宝奇订单指标表.xlsx"
+Usage:java -jar jl_bank_tool-1.0-SNAPSHOT.jar f=supp_mapp file_name="D:\svn\jilin\04.映射设计\0402.计量模型层\宝奇订单指标表.xlsx" model_file_name="D:\svn\jilin\03.模型设计\0302.智能风控系统\风险数据集市物理模型-计量层.xlsx"

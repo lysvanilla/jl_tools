@@ -6,6 +6,7 @@ import cn.hutool.poi.excel.cell.CellUtil;
 import cn.hutool.poi.excel.cell.setters.CellSetterFactory;
 import cn.sunline.util.BasicInfo;
 import cn.sunline.vo.etl.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
@@ -25,6 +26,7 @@ import static cn.sunline.mapping.EtlMappingExcelRead.readEtlMappExcel;
 import static cn.sunline.mapping.GetMappRows.getMappingMap;
 import static cn.sunline.mapping.GetMappRows.getNumber2StrMap;
 
+@Slf4j
 public class GenEtlMappExcel {
     public static final String base_export_path = BasicInfo.getBasicExportPath("映射");
     private static final String MAPP_TPL_PATH = BasicInfo.TPL_PATH + "excel/dml_mapping_template.xlsx";
@@ -50,6 +52,10 @@ public class GenEtlMappExcel {
                  FileOutputStream out = new FileOutputStream(outFile)) {
 
                 int blank_sheet = wb.getSheetIndex("空白模板");
+                if (sheetName.length()>=32){
+                    log.error("sheetName名字超长，[{}]-[{}]",sheetName.length(),sheetName);
+                    sheetName = sheetName.substring(0,31);
+                }
                 wb.setSheetName(blank_sheet, sheetName);
                 XSSFSheet sheet = wb.getSheet(sheetName);
                 int sheet_deal_row = 0;
@@ -83,6 +89,7 @@ public class GenEtlMappExcel {
     }
 
     private static void copyRows(XSSFSheet sheet, List<Row> rows, int startRow) {
+        log.debug("startRow:[{}]",startRow);
         if (rows != null) {
             sheet.copyRows(rows, startRow, cellCopyPolicy);
         }

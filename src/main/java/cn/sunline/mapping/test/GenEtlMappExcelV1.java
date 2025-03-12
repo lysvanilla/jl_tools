@@ -1,17 +1,14 @@
-package cn.sunline.mapping;
+package cn.sunline.mapping.test;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.poi.excel.RowUtil;
 import cn.hutool.poi.excel.cell.CellUtil;
-import cn.hutool.poi.excel.cell.setters.CellSetterFactory;
+import cn.sunline.mapping.GetMappRows;
 import cn.sunline.util.BasicInfo;
 import cn.sunline.vo.etl.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFPrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 

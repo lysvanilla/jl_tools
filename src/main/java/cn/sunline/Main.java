@@ -3,10 +3,7 @@ package cn.sunline;
 import cn.sunline.excel.ExcelMerger;
 import cn.sunline.excel.ExcelSheetSplitter;
 import cn.sunline.index.IndexExcelWrite;
-import cn.sunline.mapping.BatchUpdateMappExcel;
-import cn.sunline.mapping.DmlTemplateFiller;
-import cn.sunline.mapping.EtlMappToTable;
-import cn.sunline.mapping.TableToEtlMapp;
+import cn.sunline.mapping.*;
 import cn.sunline.table.ChineseToEnglishTranslator;
 import cn.sunline.table.DdlTemplateFiller;
 import cn.sunline.util.BasicInfo;
@@ -66,31 +63,34 @@ public class Main {
      */
     private static void executeOperation(String dealFun, HashMap<String, String> argsMap) {
         switch (dealFun) {
-            case "wlh":
+            case "wlh":  //物理化
                 new ChineseToEnglishTranslator().writeTranslatorExcel(argsMap);
                 break;
-            case "ddl":
+            case "ddl":  //创建DDL建表语句
                 new DdlTemplateFiller().genDdlSql(argsMap);
                 break;
-            case "dml":
+            case "dml":  //创建DML脚本
                 new DmlTemplateFiller().genDmlSqlMain(argsMap);
                 break;
-            case "update_mapp":
-                new BatchUpdateMappExcel().batchUpdateMappExcelMain(argsMap);
-                break;
-            case "gen_mapp":
+            case "gen_mapp":  //接口层映射文档生成
                 new TableToEtlMapp().tableToEtlMapp(argsMap);
                 break;
-            case "gen_table":
+            case "gen_table":  //物理模型初稿生成
                 new EtlMappToTable().etlMappToTableMain(argsMap);
                 break;
-            case "zb":
+            case "supp_mapp":  //补充映射文档模板
+                new SupplementMappExcel().supplementMappExcelMain(argsMap);
+                break;
+            case "update_mapp":  //更新映射文档模板
+                new BatchUpdateMappExcel().batchUpdateMappExcelMain(argsMap);
+                break;
+            case "zb":  //智能风控系统指标转换成标准模板
                 new IndexExcelWrite().writeIndexExcel(argsMap);
                 break;
-            case "cf":
+            case "cf":  //EXCEL拆分
                 new ExcelSheetSplitter().splitExcelSheets(argsMap);
                 break;
-            case "hb":
+            case "hb":   //EXCEL合并
                 new ExcelMerger().mergeExcelFiles(argsMap);
                 break;
             default:
