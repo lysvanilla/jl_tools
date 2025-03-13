@@ -84,6 +84,9 @@ public class Main {
             case "update_mapp":  //更新映射文档模板
                 new BatchUpdateMappExcel().batchUpdateMappExcelMain(argsMap);
                 break;
+            case "get_rela_tab":  //获取模型依赖表
+                new GetEtlMappTable().getEtlMappTableMain(argsMap);
+                break;
             case "zb":  //智能风控系统指标转换成标准模板
                 new IndexExcelWrite().writeIndexExcel(argsMap);
                 break;
