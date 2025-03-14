@@ -11,10 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import static cn.sunline.util.ArgsUtil.parseArgs;
+import static cn.sunline.util.BasicInfo.verifyLicense;
 
 @Slf4j
 public class Main {
-    private static final String VERSION = "202503050907";
+    private static final String VERSION = "202503141826";
 
     public static void main(String[] args) {
         // 输出当前编译版本
@@ -35,7 +36,7 @@ public class Main {
             log.error("未输入 f 参数，该参数必输，目前支持下述操作：\n{}", BasicInfo.HELP_FILE);
             return;
         }
-
+        verifyLicense();
         // 根据 f 参数的值执行相应的操作
         executeOperation(dealFun, argsMap);
     }

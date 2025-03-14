@@ -3,10 +3,9 @@ package cn.sunline.util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
 import cn.hutool.setting.Setting;
 import cn.idev.excel.util.StringUtils;
+import cn.melina.license.VerifyLicense;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -171,5 +170,12 @@ public class BasicInfo {
             log.error("检查目录 {} 时发生 I/O 错误", directoryPath, e);
         }
         return false;
+    }
+
+    public static void verifyLicense() {
+        boolean verify = new VerifyLicense().verifymain();
+        if (!verify){
+            System.exit(-1);
+        }
     }
 }

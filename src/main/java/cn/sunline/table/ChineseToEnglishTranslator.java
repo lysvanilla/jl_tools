@@ -47,14 +47,14 @@ public class ChineseToEnglishTranslator {
 
     public void writeTranslatorExcel(HashMap<String,String> args_map){
         String file_name=args_map.get("file_name");
+        if (!FileUtil.exist(file_name)){
+            log.error("file_name参数对应的文件不存在,[{}]",file_name);
+            return;
+        }
         writeTranslatorExcel(file_name);
     }
 
     public List<TranslationResultFull> translateChineseMain(String filePath) {
-        if (!FileUtil.exist(filePath)){
-            log.error("file_name参数对应的文件不存在,[{}]",filePath);
-            System.exit(1);
-        }
         //translationDict = LexiconInfoReader.convertListToMap(filePath);
         List<TranslationResultFull> chineseListResult = new ArrayList<>();
         List<TranslationResultFull> chineseList = readChineseFromExcel(filePath);

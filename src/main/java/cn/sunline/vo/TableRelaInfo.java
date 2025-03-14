@@ -18,6 +18,9 @@ public class TableRelaInfo {
     @ExcelProperty("依赖表")
     private String relatedTableName;
 
+    @ExcelProperty("依赖表类型")
+    private String relatedTableType;
+
     private LinkedHashSet<String> relatedTables;
     public void addRelatedTable(String relatedTable) {
         if (relatedTables == null){
@@ -42,5 +45,12 @@ public class TableRelaInfo {
         this.tableNameEn = tableNameEn;
         this.tableNameCn = tableNameCn;
         this.relatedTableName = relatedTableName;
+    }
+
+    public TableRelaInfo(String tableNameEn, String tableNameCn, String relatedTableName, String relatedTableType) {
+        this.tableNameEn = tableNameEn;
+        this.tableNameCn = tableNameCn;
+        this.relatedTableName = relatedTableName;
+        this.relatedTableType = relatedTableType;
     }
 }

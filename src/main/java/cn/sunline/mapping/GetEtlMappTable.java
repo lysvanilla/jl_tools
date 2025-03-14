@@ -32,7 +32,8 @@ public class GetEtlMappTable {
     private static final String basicExportPath = BasicInfo.getBasicExportPath("");
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\");
+        //argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层");
         getEtlMappTableMain(argsMap);
     }
 
@@ -77,6 +78,10 @@ public class GetEtlMappTable {
             String tableEnglishName = etlMapp.getTableEnglishName();
             String tableChineseName = etlMapp.getTableChineseName();
             log.info("处理[{}]-[{}]-[{}]",tableChineseName,tableEnglishName,filePath);
+            if (StringUtils.isBlank(tableEnglishName)&&StringUtils.isBlank(tableChineseName)){
+                log.error("模型未找到英文名和中文名,[{}]",filePath);
+                continue;
+            }
             TableRelaInfo tableRelaInfo = new TableRelaInfo(tableEnglishName, tableChineseName);
             List<EtlGroup> etlGroupList = etlMapp.getEtlGroupList();
             for (EtlGroup etlGroup : etlGroupList) {
@@ -97,6 +102,9 @@ public class GetEtlMappTable {
                 }
             }
             tableRelaInfos.add(tableRelaInfo);
+        }
+        if (tableRelaInfos.size() == 0){
+            log.error("模型未找到依赖表,[{}]",filePath);
         }
         return tableRelaInfos;
     }
@@ -164,8 +172,17 @@ public class GetEtlMappTable {
             String tableNameEn = tableRelaInfo.getTableNameEn();
             String tableNameCn = tableRelaInfo.getTableNameCn();
             LinkedHashSet<String> relatedTablesTmp = tableRelaInfo.getRelatedTables();
+            if (relatedTablesTmp == null){
+                log.error("未识别到依赖表：[{}]-[{}]",tableNameCn,tableNameEn);
+                continue;
+            }
             for (String relatedTable : relatedTablesTmp) {
-                tableRelaInfosAll.add(new TableRelaInfo(tableNameEn, tableNameCn, relatedTable));
+                String relatedTableType = "";
+                String relatedTableUpper = StringUtils.upperCase(relatedTable);
+                if (relatedTableUpper.startsWith("TMP") || relatedTableUpper.endsWith("TMP") ||relatedTableUpper.startsWith("TEMP") || relatedTableUpper.endsWith("TEMP")){
+                    relatedTableType ="临时表";
+                }
+                tableRelaInfosAll.add(new TableRelaInfo(tableNameEn, tableNameCn, relatedTable,relatedTableType));
             }
         }
         try(ExcelWriter excelWriter = FastExcel.write(outputPath).withTemplate(tpl_path).build()){
