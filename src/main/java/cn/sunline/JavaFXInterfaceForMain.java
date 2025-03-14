@@ -21,7 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -32,6 +31,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -43,8 +43,9 @@ public class JavaFXInterfaceForMain extends Application {
     private TextField fileNameTextField;
     private TextField modelFileNameTextField;
     private Label descriptionLabel; // 新增的说明标签
-    private TextArea logTextArea;
+    private StyleClassedTextArea logTextArea;
     private Label modelFileNameLabel;
+    private Label fileNameLabel; // 声明为类的成员变量
     private static final LinkedHashMap<String, String> CHINESE_TO_ENGLISH = new LinkedHashMap<>();
     private static final Map<String, String> FUNCTION_DESCRIPTIONS = new HashMap<>(); // 功能说明map
 
@@ -56,7 +57,7 @@ public class JavaFXInterfaceForMain extends Application {
             CHINESE_TO_ENGLISH.put("物理化", "wlh");
             CHINESE_TO_ENGLISH.put("物理模型生成DDL建表语句", "ddl");
             CHINESE_TO_ENGLISH.put("映射文档生成DML脚本", "dml");
-            CHINESE_TO_ENGLISH.put("接口层表结构生成映射文档", "gen_mapp");
+            CHINESE_TO_ENGLISH.put("接口层物理模型生成映射文档", "gen_mapp");
             CHINESE_TO_ENGLISH.put("映射文档生成物理模型初稿", "gen_table");
             CHINESE_TO_ENGLISH.put("根据物理模型补充映射文档", "supp_mapp");
             CHINESE_TO_ENGLISH.put("更新映射文档到最新模板", "update_mapp");
@@ -71,7 +72,7 @@ public class JavaFXInterfaceForMain extends Application {
             FUNCTION_DESCRIPTIONS.put("物理化", "将Excel文件中的字段中文翻译为英文，并输出拆词匹配结果");
             FUNCTION_DESCRIPTIONS.put("物理模型生成DDL建表语句", "根据物理模型Excel生成DDL建表语句、简单的insert语句");
             FUNCTION_DESCRIPTIONS.put("映射文档生成DML脚本", "根据映射文档Excel生成DML脚本");
-            FUNCTION_DESCRIPTIONS.put("接口层表结构生成映射文档", "根据接口层表结构生成接口层映射文档");
+            FUNCTION_DESCRIPTIONS.put("接口层物理模型生成映射文档", "根据接口层表结构生成接口层映射文档");
             FUNCTION_DESCRIPTIONS.put("映射文档生成物理模型初稿", "根据映射文档生成物理模型初稿");
             FUNCTION_DESCRIPTIONS.put("根据物理模型补充映射文档", "根据物理模型的表结构信息，更新映射文档中的字段英文名、过滤条件");
             FUNCTION_DESCRIPTIONS.put("更新映射文档到最新模板", "更新已有的映射文档");
@@ -82,8 +83,8 @@ public class JavaFXInterfaceForMain extends Application {
         }
 
         // 输出键集以进行调试
-        System.out.println("功能映射键: " + CHINESE_TO_ENGLISH.keySet());
-        System.out.println("功能描述键: " + FUNCTION_DESCRIPTIONS.keySet());
+        //System.out.println("功能映射键: " + CHINESE_TO_ENGLISH.keySet());
+        //System.out.println("功能描述键: " + FUNCTION_DESCRIPTIONS.keySet());
     }
 
     private static boolean appenderAdded = false;
@@ -228,9 +229,6 @@ public class JavaFXInterfaceForMain extends Application {
         // 设置更大的字体和更高的高度
         dealFunComboBox.setStyle("-fx-font-size: 16px;");
 
-
-
-
         // 创建功能说明标签
         descriptionLabel = new Label();
         descriptionLabel.setFont(font);
@@ -241,18 +239,18 @@ public class JavaFXInterfaceForMain extends Application {
         dealFunBox.setAlignment(Pos.CENTER_LEFT);
         dealFunBox.getChildren().addAll(dealFunComboBox, descriptionLabel);
         // 添加调试信息
-        System.out.println("下拉框选项数量: " + dealFunComboBox.getItems().size());
-        System.out.println("当前选中项: " + dealFunComboBox.getValue());
+        log.debug("下拉框选项数量: {}",dealFunComboBox.getItems().size());
+        log.debug("当前选中项: {}",dealFunComboBox.getValue());
 
         // 初始显示第一个功能的说明
         updateDescriptionLabel(dealFunComboBox.getValue());
 
-        Label fileNameLabel = new Label("输入 file_name:");
+        fileNameLabel = new Label("* 输入待物理化文件file_name:");
         fileNameLabel.setFont(font);
         fileNameTextField = new TextField();
         fileNameTextField.setFont(font);
 
-        modelFileNameLabel = new Label("输入 model_file_name:");
+        modelFileNameLabel = new Label("* 输入物理模型文件model_file_name:");
         modelFileNameLabel.setFont(font);
         modelFileNameTextField = new TextField();
         modelFileNameTextField.setFont(font);
@@ -262,13 +260,54 @@ public class JavaFXInterfaceForMain extends Application {
         modelFileNameTextField.setManaged(false);
 
         dealFunComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if ("补充映射文档模板".equals(newValue)) {
-                showModelFileNameFields();
+            if ("根据物理模型补充映射文档".equals(newValue)) {
+                changeModelFileNameFieldsStatus(modelFileNameLabel,modelFileNameTextField,true);
             } else {
-                hideModelFileNameFields();
+                changeModelFileNameFieldsStatus(modelFileNameLabel,modelFileNameTextField,false);
             }
             // 更新说明标签
             updateDescriptionLabel(newValue);
+
+            // 根据下拉框的值调整 fileNameLabel 的文字显示
+            switch (newValue) {
+                case "物理化":
+                    fileNameLabel.setText("* 输入待物理化文件file_name:");
+                    break;
+                case "物理模型生成DDL建表语句":
+                    fileNameLabel.setText("* 输入物理模型文件file_name:");
+                    break;
+                case "映射文档生成DML脚本":
+                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
+                    break;
+                case "接口层物理模型生成映射文档":
+                    fileNameLabel.setText("* 输入接口层物理模型文件file_name:");
+                    break;
+                case "映射文档生成物理模型初稿":
+                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
+                    break;
+                case "根据物理模型补充映射文档":
+                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
+                    modelFileNameLabel.setText("* 输入物理模型文件model_file_name:");
+                    break;
+                case "更新映射文档到最新模板":
+                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
+                    break;
+                case "根据映射文档获取模型依赖表":
+                    fileNameLabel.setText("* 输入映射文档文件称或者文件夹file_name:");
+                    break;
+                case "指标过程Excel文档转换标准模板":
+                    fileNameLabel.setText("* 输入指标过程Excel文件file_name:");
+                    break;
+                case "EXCEL拆分":
+                    fileNameLabel.setText("* 输入待拆分Excel文件file_name:");
+                    break;
+                case "EXCEL合并":
+                    fileNameLabel.setText("* 输入待合并Excel文件file_name:");
+                    break;
+                default:
+                    fileNameLabel.setText("* 输入待物理化文件file_name:");
+            }
+
         });
 
         Button executeButton = new Button("执行命令");
@@ -294,37 +333,35 @@ public class JavaFXInterfaceForMain extends Application {
         descriptionLabel.setText(description);
     }
 
-    private TextArea createLogTextArea() {
-        Font font = Font.font("微软雅黑", 16);
-        TextArea logTextArea = new TextArea();
-        logTextArea.setFont(font);
-        logTextArea.setEditable(false);
-        logTextArea.setPrefRowCount(30);
-        logTextArea.setPrefColumnCount(80);
-        return logTextArea;
+    private StyleClassedTextArea createLogTextArea() {
+        StyleClassedTextArea textArea = new StyleClassedTextArea();
+        textArea.getStyleClass().add("log-area");
+        textArea.setEditable(false);
+        // 使用setPrefSize或setPrefHeight/setPrefWidth替代setPrefRowCount和setPrefColumnCount
+        textArea.setPrefHeight(400); // 设置首选高度
+        textArea.setPrefWidth(800);  // 设置首选宽度
+        
+        // 添加CSS样式
+        textArea.getStylesheets().add(
+            JavaFXInterfaceForMain.class.getResource("/log-styles.css").toExternalForm()
+        );
+        return textArea;
     }
 
-    private VBox createRootLayout(VBox inputPanel, TextArea logTextArea) {
+    private VBox createRootLayout(VBox inputPanel, StyleClassedTextArea logTextArea) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20));
         root.getChildren().addAll(inputPanel, logTextArea);
         return root;
     }
 
-
-    private void showModelFileNameFields() {
-        modelFileNameLabel.setVisible(true);
-        modelFileNameLabel.setManaged(true);
-        modelFileNameTextField.setVisible(true);
-        modelFileNameTextField.setManaged(true);
+    private void changeModelFileNameFieldsStatus(Label modelFileNameLabelVar,TextField modelFileNameTextFieldVar,boolean visibleFlag) {
+        modelFileNameLabelVar.setVisible(visibleFlag);
+        modelFileNameLabelVar.setManaged(visibleFlag);
+        modelFileNameTextFieldVar.setVisible(visibleFlag);
+        modelFileNameTextFieldVar.setManaged(visibleFlag);
     }
 
-    private void hideModelFileNameFields() {
-        modelFileNameLabel.setVisible(false);
-        modelFileNameLabel.setManaged(false);
-        modelFileNameTextField.setVisible(false);
-        modelFileNameTextField.setManaged(false);
-    }
 
     private String[] getCommandArgs() {
         String dealFunChinese = dealFunComboBox.getValue();
@@ -343,7 +380,7 @@ public class JavaFXInterfaceForMain extends Application {
         return args;
     }
 
-    private void addCustomAppender(TextArea textArea) {
+    private void addCustomAppender(StyleClassedTextArea textArea) {
         if (!appenderAdded) {
             LoggerContext context = (LoggerContext) LogManager.getContext(false);
             Configuration config = context.getConfiguration();
@@ -355,31 +392,17 @@ public class JavaFXInterfaceForMain extends Application {
                     return;
                 }
             }
-            // 移除配置文件中的所有 Appender
-            for (String appenderName : config.getAppenders().keySet()) {
-                Appender appender = config.getAppender(appenderName);
-                if (appender != null) {
-                    appender.stop();
-                    config.getAppenders().remove(appenderName);
-                    System.out.println("Removed appender: " + appenderName);
-                }
-            }
-            // 清空根日志器的 Appender 引用
-            LoggerConfig rootLoggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
-            java.util.List<org.apache.logging.log4j.core.config.AppenderRef> appenderRefs = rootLoggerConfig.getAppenderRefs();
-            for (org.apache.logging.log4j.core.config.AppenderRef appenderRef : appenderRefs) {
-                rootLoggerConfig.removeAppender(appenderRef.getRef());
-                System.out.println("Removed appender ref: " + appenderRef.getRef());
-            }
-
-            PatternLayout layout = PatternLayout.newBuilder().withPattern("%msg%n").build();
+            
+            PatternLayout layout = PatternLayout.newBuilder().withPattern("%d{yyyy-MM-dd HH:mm:ss} %-5p - %m%n").build();
             FXSwingAppender swingAppender = new FXSwingAppender("FX_SWING_APPENDER", null, layout, false, textArea);
             swingAppender.start();
             config.addAppender(swingAppender);
+            
+            LoggerConfig rootLoggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
             rootLoggerConfig.addAppender(swingAppender, Level.ALL, null);
             context.updateLoggers();
             appenderAdded = true;
-            System.out.println("FX_SWING_APPENDER added successfully.");
+            log.debug("FX_SWING_APPENDER added successfully.");
         }
     }
 
@@ -389,14 +412,14 @@ public class JavaFXInterfaceForMain extends Application {
 
     // 自定义 Log4j2 日志追加器
     static class FXSwingAppender extends AbstractAppender {
-        private TextArea textArea;
+        private StyleClassedTextArea textArea;
         private String lastMessage = "";
         private long lastLogTime = 0;
-        private static final long DEDUPLICATION_WINDOW_MS = 50; // 50ms window to detect duplicates
+        private static final long DEDUPLICATION_WINDOW_MS = 50;
 
         protected FXSwingAppender(String name, org.apache.logging.log4j.core.Filter filter,
-                                  org.apache.logging.log4j.core.Layout<?> layout, boolean ignoreExceptions,
-                                  TextArea textArea) {
+                                org.apache.logging.log4j.core.Layout<?> layout, boolean ignoreExceptions,
+                                StyleClassedTextArea textArea) {
             super(name, filter, layout, ignoreExceptions);
             this.textArea = textArea;
         }
@@ -406,19 +429,36 @@ public class JavaFXInterfaceForMain extends Application {
             String message = new String(getLayout().toByteArray(event));
             long currentTime = System.currentTimeMillis();
 
-            // Deduplicate messages within a short time window
+            // 避免短时间内的重复消息
             if (message.equals(lastMessage) &&
                     (currentTime - lastLogTime) < DEDUPLICATION_WINDOW_MS) {
-                // Skip duplicate message
                 return;
             }
-
-            // Update our tracking variables
             lastMessage = message;
             lastLogTime = currentTime;
 
             javafx.application.Platform.runLater(() -> {
+                // 获取当前文本长度，用于后续应用样式
+                int startIndex = textArea.getLength();
+                
+                // 追加新消息
                 textArea.appendText(message);
+                
+                // 检查是否为错误消息 - 通过消息内容或日志级别
+                boolean isError = message.toLowerCase().contains("error") || 
+                                 event.getLevel().equals(Level.ERROR);
+                
+                // 只对当前添加的消息应用样式
+                if (isError) {
+                    textArea.setStyleClass(startIndex, textArea.getLength(), "error-text");
+                }else{
+                    textArea.setStyleClass(startIndex, textArea.getLength(), "normal-text");
+                }
+                // 注意：不设置normal-text样式，让非错误消息使用默认样式
+                
+                // 滚动到底部
+                textArea.moveTo(textArea.getLength());
+                textArea.requestFollowCaret();
             });
         }
     }
