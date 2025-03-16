@@ -53,7 +53,7 @@ public class JavaFXInterfaceForMain extends Application {
     private void initializeMaps() {
         // 仅在映射为空时初始化，避免重复初始化
         if (CHINESE_TO_ENGLISH.isEmpty()) {
-            System.out.println("初始化功能映射...");
+            log.info("初始化功能映射...");
             CHINESE_TO_ENGLISH.put("物理化", "wlh");
             CHINESE_TO_ENGLISH.put("物理模型生成DDL建表语句", "ddl");
             CHINESE_TO_ENGLISH.put("映射文档生成DML脚本", "dml");
@@ -68,7 +68,7 @@ public class JavaFXInterfaceForMain extends Application {
         }
 
         if (FUNCTION_DESCRIPTIONS.isEmpty()) {
-            System.out.println("初始化功能描述...");
+            log.info("初始化功能描述...");
             FUNCTION_DESCRIPTIONS.put("物理化", "将Excel文件中的字段中文翻译为英文，并输出拆词匹配结果");
             FUNCTION_DESCRIPTIONS.put("物理模型生成DDL建表语句", "根据物理模型Excel生成DDL建表语句、简单的insert语句");
             FUNCTION_DESCRIPTIONS.put("映射文档生成DML脚本", "根据映射文档Excel生成DML脚本");
@@ -204,7 +204,10 @@ public class JavaFXInterfaceForMain extends Application {
 
         Button closeButton = new Button("关闭");
         closeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px;");
-        closeButton.setOnAction(e -> primaryStage.close());
+        closeButton.setOnAction(e -> {
+            log.info("程序正常退出");
+            primaryStage.close();
+        });
 
         titleBar.getChildren().addAll(titleText, spacer, closeButton);
         return titleBar;
@@ -388,7 +391,7 @@ public class JavaFXInterfaceForMain extends Application {
             for (Appender appender : config.getAppenders().values()) {
                 if (appender.getName().equals("FX_SWING_APPENDER")) {
                     appenderAdded = true;
-                    System.out.println("FX_SWING_APPENDER already exists, skipping addition.");
+                    log.debug("FX_SWING_APPENDER already exists, skipping addition.");
                     return;
                 }
             }

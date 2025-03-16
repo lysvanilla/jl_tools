@@ -40,6 +40,7 @@ public class BasicInfo {
     public static final String DIST_SUFFIX = DateUtil.format(DateUtil.date(), "MMdd_HHmmss");
     // 模板配置文件的设置对象
     public static final Setting TEMPLATE_SETTING = new Setting(GLOBAL_CONFIG_PATH + "template_config.txt");
+    public static String dbConfigFile = BASE_PATH+"db.setting";
 
     /**
      * 程序入口方法，用于测试获取基础导出路径的功能。
