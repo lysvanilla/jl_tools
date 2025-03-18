@@ -150,6 +150,7 @@
             </resource>
         </resources>
         <plugins>
+            <!-- 第一个 JAR 包的配置（默认输出） -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -157,14 +158,37 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!--<mainClass>cn.sunline.Main</mainClass>-->
-                            <mainClass>cn.sunline.JavaFXInterfaceForMain</mainClass>
+                            <mainClass>cn.sunline.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                         </manifest>
                     </archive>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
                 </configuration>
+            </plugin>
+            <!-- 第二个 JAR 包的配置 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>jar-with-main-class</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>cn.sunline.JavaFXInterfaceForMain</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>libs/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                            <classifier>gui</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -193,96 +217,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            <plugin><!--用混淆插件混淆代码-->
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <maxMemory>4g</maxMemory> <!-- 增大内存 -->
-                    <attach>false</attach>
-                    <!--<attachArtifactClassifier>pg</attachArtifactClassifier>-->
-                    <!-- attach 的作用是在 install 与 deploy 时将生成的 pg 文件也安装与部署 -->
-                    <options> <!-- 详细配置方式参考 ProGuard 官方文档 -->
-                        <option>-ignorewarnings</option>
-                        <option>-dontshrink</option>
-                        <option>-dontoptimize</option>
-                        <option>-dontskipnonpubliclibraryclasses</option>
-                        <option>-dontskipnonpubliclibraryclassmembers</option>
-                        <option>-dontnote</option>
-                        <option>-keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*</option>
-                        <option>-allowaccessmodification</option>
-                        <option>-keepattributes Exceptions,SourceFile,LineNumberTable</option>
-
-                        <option>-keep class cn.idev.** { *; }</option>
-
-                        <option>-keep class javafx.** { *; }</option>
-                        <option>-keep class com.sun.javafx.** { *; }</option>
-                        <option>-keep class com.sun.glass.** { *; }</option>
-                        <option>-keep class com.sun.prism.** { *; }</option>
-                        <option>-keep class com.sun.scenario.** { *; }</option>
-
-                        <!-- Preserve text rendering components -->
-                        <option>-keep class javafx.scene.text.** { *; }</option>
-                        <option>-keep class com.sun.javafx.text.** { *; }</option>
-                        <option>-keep class com.sun.javafx.font.** { *; }</option>
-
-                        <!-- Specifically preserve ListCell and ComboBox functionality -->
-                        <option>-keep class * extends javafx.scene.control.Cell { *; }</option>
-                        <option>-keep class * extends javafx.scene.control.ListCell { *; }</option>
-                        <option>-keep class * extends javafx.scene.control.ComboBoxBase { *; }</option>
-
-                        <!-- Preserve internal JavaFX styling mechanisms -->
-                        <option>-keep class com.sun.javafx.css.** { *; }</option>
-                        <option>-keep class com.sun.javafx.scene.control.** { *; }</option>
-
-                        <!-- Preserve property and binding mechanisms -->
-                        <option>-keep class com.sun.javafx.binding.** { *; }</option>
-                        <option>-keep class com.sun.javafx.property.** { *; }</option>
-
-                        <!-- Preserve JavaFX internal event handling -->
-                        <option>-keep class com.sun.javafx.event.** { *; }</option>
-                        <!-- 保留 JavaFX 应用程序入口类 -->
-                        <option>-keep class cn.sunline.JavaFXInterfaceForMain { *; }</option>
-                        <option>-keepclassmembers class cn.sunline.JavaFXInterfaceForMain {
-                            public static void main(java.lang.String[]);
-                            }</option>
-                        <!-- 保留 JavaFX 服务类 -->
-                        <option>-keep class javafx.concurrent.** { *; }</option>
-                        <!-- 其他配置 -->
-                        <option>-dontwarn javafx.**</option>
-                        <!-- 保留其他依赖类 -->
-                        <option>-keep class de.schlichtherle.** { *; }</option>
-                        <option>-keep class cn.melina.license.** { *; }</option>
-
-                    </options>
-                    <!--指定混淆的jar包，我这里是将上一步输出的jar包进行混淆-->
-                    <injar>${project.artifactId}-${project.version}.jar</injar>
-                    <!--指定输出的jar包名-->
-                    <outjar>${project.artifactId}-${project.version}-pg.jar</outjar>
-                    <!-- 禁用自动添加 -pg 后缀 -->
-                    <addMavenDescriptor>false</addMavenDescriptor>
-                    <obfuscate>true</obfuscate>
-                    <!-- 添加依赖，必须添加，不然会报一些莫名错误-->
-                    <libs>
-                        <!-- 取消注释并添加 Java 8 的依赖 -->
-                        <lib>${java.home}/lib/rt.jar</lib>
-                        <lib>${java.home}/lib/jce.jar</lib>
-                        <!-- 添加项目编译后的类 -->
-                        <lib>${project.build.outputDirectory}</lib>
-                    </libs>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-
-
 </project>
