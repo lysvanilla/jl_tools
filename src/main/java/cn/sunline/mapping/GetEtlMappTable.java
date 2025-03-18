@@ -4,11 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.idev.excel.ExcelWriter;
 import cn.idev.excel.FastExcel;
 import cn.idev.excel.write.metadata.WriteSheet;
-import cn.sunline.table.LexiconInfoReader;
 import cn.sunline.util.BasicInfo;
-import cn.sunline.vo.SplitWordsFailure;
 import cn.sunline.vo.TableRelaInfo;
-import cn.sunline.vo.TranslationResultFull;
 import cn.sunline.vo.etl.EtlGroup;
 import cn.sunline.vo.etl.EtlGroupJoinInfo;
 import cn.sunline.vo.etl.EtlMapp;
@@ -21,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.sunline.mapping.EtlMappingExcelRead.readEtlMappExcel;
 
@@ -165,8 +161,6 @@ public class GetEtlMappTable {
     }
 
     public static void writeExcel(List<TableRelaInfo> tableRelaInfos,String outputPath) {
-        File templateFile = new File(tpl_path);
-        File outputFile = new File(outputPath);
         List<TableRelaInfo> tableRelaInfosAll = new ArrayList<>();
         for (TableRelaInfo tableRelaInfo : tableRelaInfos) {
             String tableNameEn = tableRelaInfo.getTableNameEn();

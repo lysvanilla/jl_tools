@@ -3,6 +3,7 @@ package cn.sunline.excel;
 import cn.hutool.core.io.FileUtil;
 import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -84,6 +85,8 @@ public class ExcelSheetSplitter {
             log.error("文件不存在，请检查路径：[{}]", inputFilePath);
             return;
         }
+        // 调整最小压缩率限制，防止因压缩率问题导致文件读取失败
+        ZipSecureFile.setMinInflateRatio(0);
         // 使用 try-with-resources 语句打开输入文件流和工作簿，确保资源自动关闭
         try (FileInputStream fis = new FileInputStream(inputFilePath);
              Workbook workbook = new XSSFWorkbook(fis)) {

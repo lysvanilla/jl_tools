@@ -57,8 +57,9 @@ public class DmlTemplateFiller {
         //genDmlSql("D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
         Map<String, String> argsMap = new HashMap<>();
         //argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\");
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
-        genDmlSqlMain(argsMap);
+        //argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\总账科目余额.xlsx");
+        new DmlTemplateFiller().genDmlSqlMain(argsMap);
     }
 
     /**
@@ -67,7 +68,7 @@ public class DmlTemplateFiller {
      *
      * @param argsMap 包含参数的 HashMap，其中应包含 "file_name" 键，对应 Excel 文件的路径
      */
-    public static void genDmlSqlMain(Map<String, String> argsMap) {
+    public void genDmlSqlMain(Map<String, String> argsMap) {
         // 从 HashMap 中获取文件路径
         String filePath = argsMap.get("file_name");
         // 检查文件路径是否为空
@@ -302,7 +303,7 @@ public class DmlTemplateFiller {
             sortingCondition = "order by " + sortingCondition;
         }
 
-        groupMappingSql = replacePlaceholder(groupMappingSql, "${where_condition}", ReUtil.escape(filterCondition));
+        groupMappingSql = replacePlaceholder(groupMappingSql, "${where_condition}", filterCondition);
         groupMappingSql = replacePlaceholder(groupMappingSql, "${groupby_condition}", groupingCondition);
         groupMappingSql = replacePlaceholder(groupMappingSql, "${orderby_condition}", sortingCondition);
         groupMappingSql = replacePlaceholder(groupMappingSql, "@{db_key}", distributionKey);
@@ -330,7 +331,6 @@ public class DmlTemplateFiller {
             String sourceFieldChineseName = etlGroupColMapp.getSourceFieldChineseName();
             String sourceFieldEnglishName = etlGroupColMapp.getSourceFieldEnglishName();
             String groupMappingColRemark = etlGroupColMapp.getRemarks();
-            String targetFieldType = etlGroupColMapp.getTargetFieldType();
 
             if (StringUtils.isEmpty(sourceFieldChineseName)) {
                 sourceFieldChineseName = targetFieldChineseName;

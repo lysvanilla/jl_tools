@@ -1,8 +1,6 @@
 package cn.sunline.mapping;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.poi.excel.RowUtil;
-import org.apache.poi.ss.usermodel.CellCopyPolicy;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,7 +16,7 @@ public class GetMappRows {
     private static String template_file = prePath+"dml_mapping_template.xlsx";
 
     public static void main(String[] args) {
-
+        HashMap<String,List<Row>> mapping_map = getMappingMap(template_file);
     }
 
     public static HashMap<String,List<Row>> getMappingMap(String template_excel){

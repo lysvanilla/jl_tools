@@ -1,6 +1,7 @@
 package cn.sunline.mapping;
 
 import cn.sunline.vo.etl.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
@@ -8,15 +9,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class EtlMappingExcelRead {
     public static void main(String[] args) {
-        List<EtlMapp> etlMappList = readEtlMappExcel("D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
-        System.out.println("1");
+        List<EtlMapp> etlMappList = readEtlMappExcel("D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\个人业务申请信息.xlsx");
+        System.out.println("1"+etlMappList.size());
     }
 
     public static List<EtlMapp> readEtlMappExcel(String filePath)  {
@@ -188,7 +188,9 @@ public class EtlMappingExcelRead {
     }
 
     private static String getCellValue(Cell cell) {
-        if (cell == null) return "";
+        if (cell == null) {
+            return "";
+        }
         cell.setCellType(CellType.STRING);
         return cell.getStringCellValue().trim();
     }

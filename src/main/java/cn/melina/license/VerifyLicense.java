@@ -1,7 +1,6 @@
 package cn.melina.license;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.log.Log;
 import cn.melina.license.deviceinfo.AbstractServerInfos;
 import cn.melina.license.deviceinfo.LinuxServerInfos;
 import cn.melina.license.deviceinfo.WindowsServerInfos;

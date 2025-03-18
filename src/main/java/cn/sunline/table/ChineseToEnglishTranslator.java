@@ -32,6 +32,7 @@ public class ChineseToEnglishTranslator {
         String filePath = "C:\\Users\\lysva\\Desktop\\物理化工具.xlsx";
         filePath = "C:\\Users\\lysva\\Desktop\\物理化工具.xlsx";
         filePath = "D:\\Users\\Documents\\WXWork\\1688851370921495\\Cache\\File\\2025-03\\物理化工具.xlsx";
+        filePath = "C:\\Users\\lysva\\Desktop\\待物理化工具.xlsx";
         // 用于存储中文到英文的映射字典
 
        /* ChineseToEnglishTranslator translator = new ChineseToEnglishTranslator();
@@ -75,8 +76,6 @@ public class ChineseToEnglishTranslator {
     }
 
     public static void writeExcel(List<TranslationResultFull> translationResultFullList, String templatePath, String outputPath) {
-        File templateFile = new File(templatePath);
-        File outputFile = new File(outputPath);
         //System.out.println(FileUtil.exist(templatePath)+"\t"+templatePath);
         //System.out.println(FileUtil.exist(outputPath)+"\t"+outputPath);
         try(ExcelWriter excelWriter = FastExcel.write(outputPath).withTemplate(templatePath).build()){

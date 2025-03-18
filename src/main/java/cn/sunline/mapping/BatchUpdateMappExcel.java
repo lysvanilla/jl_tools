@@ -6,9 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static cn.sunline.mapping.EtlMappingExcelRead.readEtlMappExcel;
 import static cn.sunline.mapping.GenEtlMappExcel.genEtlMappExcel;
@@ -17,7 +22,7 @@ import static cn.sunline.mapping.GenEtlMappExcel.genEtlMappExcel;
 public class BatchUpdateMappExcel {
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\");
         batchUpdateMappExcelMain(argsMap);
     }
 
@@ -34,7 +39,10 @@ public class BatchUpdateMappExcel {
     }
     public static void batchUpdateMappExcelMain(String filePath){
         if (FileUtil.isDirectory(filePath)){
-            for (File file : FileUtil.ls(filePath)) {
+            List<File> files = FileUtil.loopFiles(filePath);
+            // 使用 Collections.sort 方法和自定义的 Comparator 对列表进行排序
+            Collections.sort(files, Comparator.comparing(File::getName));
+            for (File file : files) {
                 String fileName = file.getName();
                 if (fileName.startsWith("~") && !fileName.equals(".xlsx")){
                     continue;
@@ -47,6 +55,7 @@ public class BatchUpdateMappExcel {
     }
 
     public static void batchUpdateMappExcel(String filePath){
+        log.info("开始补充映射表: {}", filePath);
         List<EtlMapp> etlMappList = readEtlMappExcel(filePath);
         genEtlMappExcel(etlMappList);
     }

@@ -103,6 +103,7 @@ public class ExcelTableStructureReader {
             // 记录开始将表基本信息放入 Map 的日志
             log.debug("开始将表基本信息放入 Map");
             for (TableStructure table : tableStructures) {
+                //log.info("table.getTableNameEn()[{}]",table.toString());
                 // 检查表的英文名称是否有效
                 if (table.getTableNameEn() != null && !table.getTableNameEn().trim().isEmpty()) {
                     // 将表信息放入 Map

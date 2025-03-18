@@ -1,7 +1,6 @@
 package cn.sunline.vo.etl;
 
 import cn.idev.excel.annotation.ExcelProperty;
-import cn.sunline.vo.TableFieldInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

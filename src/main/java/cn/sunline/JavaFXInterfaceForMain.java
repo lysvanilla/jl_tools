@@ -1,5 +1,6 @@
 package cn.sunline;
 
+import javafx.scene.control.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -18,11 +19,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -152,8 +148,6 @@ public class JavaFXInterfaceForMain extends Application {
         scene.setOnMouseDragged((MouseEvent event) -> {
             double x = event.getSceneX();
             double y = event.getSceneY();
-            double width = scene.getWidth();
-            double height = scene.getHeight();
             Cursor cursor = scene.getCursor();
             if (cursor == Cursor.NW_RESIZE) {
                 primaryStage.setX(primaryStage.getX() + x);
@@ -340,14 +334,24 @@ public class JavaFXInterfaceForMain extends Application {
         StyleClassedTextArea textArea = new StyleClassedTextArea();
         textArea.getStyleClass().add("log-area");
         textArea.setEditable(false);
-        // 使用setPrefSize或setPrefHeight/setPrefWidth替代setPrefRowCount和setPrefColumnCount
-        textArea.setPrefHeight(400); // 设置首选高度
-        textArea.setPrefWidth(800);  // 设置首选宽度
+        textArea.setPrefHeight(400);
+        textArea.setPrefWidth(800);
+        
+        // 启用水平滚动
+        textArea.setWrapText(false);
+        
+        // 创建ScrollPane并添加textArea
+        ScrollPane scrollPane = new ScrollPane(textArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // 始终显示水平滚动条
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // 需要时显示垂直滚动条
         
         // 添加CSS样式
         textArea.getStylesheets().add(
             JavaFXInterfaceForMain.class.getResource("/log-styles.css").toExternalForm()
         );
+        
         return textArea;
     }
 

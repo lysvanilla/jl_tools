@@ -3,7 +3,7 @@ package cn.sunline.vo;
 import cn.idev.excel.annotation.ExcelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -11,6 +11,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@ToString
 public class TableStructure {
     // Excel映射属性
     @ExcelProperty("序号")

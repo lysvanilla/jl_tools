@@ -21,8 +21,8 @@ import static cn.sunline.mapping.GenEtlMappExcel.genEtlMappExcel;
 public class SupplementMappExcel {
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
-        argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\");
+        argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层.xlsx");
         supplementMappExcelMain(argsMap);
     }
 
@@ -64,6 +64,7 @@ public class SupplementMappExcel {
     }
 
     public static void supplementMappExcel(String filePath,LinkedHashMap<String, TableStructure> tableMap){
+        log.info("开始补充映射表: {}", filePath);
         List<EtlMapp> etlMappList = readEtlMappExcel(filePath);
         List<EtlMapp> supplementEtlMappList = supplementEtlMapp(etlMappList,tableMap);
         genEtlMappExcel(supplementEtlMappList);
@@ -72,6 +73,7 @@ public class SupplementMappExcel {
     public static List<EtlMapp> supplementEtlMapp(List<EtlMapp> etlMappList,LinkedHashMap<String, TableStructure> tableMap){
         //List<EtlMapp> etlMappListResult = new ArrayList<>();
         for (EtlMapp etlMapp : etlMappList) {
+            String attributionLevel = StringUtils.defaultString(etlMapp.getAttributionLevel(),"");
             List<EtlGroup> etlGroupList = etlMapp.getEtlGroupList();
             for (EtlGroup etlGroup : etlGroupList) {
                 List<EtlGroupColMapp> etlGroupColMappList  = etlGroup.getEtlGroupColMappList();
@@ -90,7 +92,12 @@ public class SupplementMappExcel {
                 LinkedHashMap<String, TableFieldInfo> fieldCnMap = tableStructure.getFieldCnMap();
                 for (EtlGroupColMapp etlGroupColMapp : etlGroupColMappList) {
                     String targetFieldChineseName = etlGroupColMapp.getTargetFieldChineseName();
+                    String sourceTableEnglishName = etlGroupColMapp.getSourceTableEnglishName();
+                    String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
                     TableFieldInfo tableFieldInfo = fieldCnMap.get(targetFieldChineseName);
+                    if (sourceTableEnglishNameLower.startsWith("c_") || sourceTableEnglishNameLower.startsWith("m_")){
+                        etlGroupColMapp.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
+                    }
                     if (tableFieldInfo == null){
                         continue;
                     }else{
@@ -102,10 +109,15 @@ public class SupplementMappExcel {
                 for (EtlGroupJoinInfo etlGroupJoinInfo : etlGroupJoinInfoList) {
                     String sourceTableSchema = etlGroupJoinInfo.getSourceTableSchema();
                     String sourceTableEnglishName = etlGroupJoinInfo.getSourceTableEnglishName();
+                    String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
+                    if (sourceTableEnglishNameLower.startsWith("c") || sourceTableEnglishNameLower.startsWith("m")){
+                        etlGroupJoinInfo.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
+                        etlGroupJoinInfo.setSourceTableSchema("pdata");
+                    }
                     if (StringUtils.isNotBlank(sourceTableSchema)){
                         continue;
                     } else if (!sourceTableEnglishName.contains("(")) {
-                        etlGroupJoinInfo.setSourceTableSchema("pm_ridata");
+                        etlGroupJoinInfo.setSourceTableSchema("pdata");
                     }
                 }
             }

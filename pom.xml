@@ -117,34 +117,11 @@
             <artifactId>richtextfx</artifactId>
             <version>0.10.6</version>
         </dependency>
-        <!-- JavaFX dependencies -->
-        <!--<dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>17.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>17.0.2</version>
-        </dependency>
-        &lt;!&ndash; 根据你的 Java 版本和系统选择合适的 JavaFX 运行时 &ndash;&gt;
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>17.0.2</version>
-            <classifier>win</classifier> &lt;!&ndash; 根据你的操作系统选择，如 win、mac、linux &ndash;&gt;
-        </dependency>-->
         <!-- SQLite JDBC Driver -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.46.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>2.0.24</version>
         </dependency>
     </dependencies>
 
@@ -186,7 +163,7 @@
                             <classpathPrefix>libs/</classpathPrefix>
                         </manifest>
                     </archive>
-                    <finalName>${project.artifactId}-${project.version}-src</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                 </configuration>
             </plugin>
             <plugin>
@@ -244,6 +221,8 @@
                         <option>-allowaccessmodification</option>
                         <option>-keepattributes Exceptions,SourceFile,LineNumberTable</option>
 
+                        <option>-keep class cn.idev.** { *; }</option>
+
                         <option>-keep class javafx.** { *; }</option>
                         <option>-keep class com.sun.javafx.** { *; }</option>
                         <option>-keep class com.sun.glass.** { *; }</option>
@@ -285,9 +264,9 @@
 
                     </options>
                     <!--指定混淆的jar包，我这里是将上一步输出的jar包进行混淆-->
-                    <injar>${project.artifactId}-${project.version}-src.jar</injar>
+                    <injar>${project.artifactId}-${project.version}.jar</injar>
                     <!--指定输出的jar包名-->
-                    <outjar>${project.artifactId}-${project.version}.jar</outjar>
+                    <outjar>${project.artifactId}-${project.version}-pg.jar</outjar>
                     <!-- 禁用自动添加 -pg 后缀 -->
                     <addMavenDescriptor>false</addMavenDescriptor>
                     <obfuscate>true</obfuscate>

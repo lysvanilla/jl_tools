@@ -1,12 +1,5 @@
 package cn.sunline;
 
-import cn.sunline.excel.ExcelMerger;
-import cn.sunline.excel.ExcelSheetSplitter;
-import cn.sunline.index.IndexExcelWrite;
-import cn.sunline.mapping.*;
-import cn.sunline.table.ChineseToEnglishTranslator;
-import cn.sunline.table.DdlTemplateFiller;
-import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -25,12 +18,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cn.sunline.util.ArgsUtil.parseArgs;
-import static cn.sunline.util.BasicInfo.verifyLicense;
 
 @Slf4j
 public class SwingInterfaceForMain extends JFrame {
-    private static final String VERSION = "202503050907";
     private JComboBox<String> dealFunComboBox;
     private JTextField fileNameTextField;
     private JTextField modelFileNameTextField;

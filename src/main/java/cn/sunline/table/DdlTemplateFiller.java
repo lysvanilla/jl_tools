@@ -8,6 +8,8 @@ import cn.sunline.vo.TableFieldInfo;
 import cn.sunline.vo.TableStructure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
 import java.util.*;
 
 import static cn.sunline.util.BasicInfo.TEMPLATE_SETTING;
@@ -21,9 +23,9 @@ import static cn.sunline.util.GetTemplateInfo.removeFirstOccurence;
 @Slf4j
 public class DdlTemplateFiller {
     // 定义导出文件的基础路径，通过 BasicInfo 类的方法获取
-    public static final String base_export_path = BasicInfo.getBasicExportPath("autocode/ddl");
-    public static final String base_export_insert_path = BasicInfo.getBasicExportPath("autocode/insert");
-    public static final String base_export_dml_path = BasicInfo.getBasicExportPath("autocode/dml_a");
+    public static final String base_export_path = BasicInfo.getBasicExportPath("autocode"+ File.separator+"ddl");
+    public static final String base_export_insert_path = BasicInfo.getBasicExportPath("autocode"+File.separator+"insert");
+    public static final String base_export_dml_path = BasicInfo.getBasicExportPath("autocode"+File.separator+"dml_a");
     private static final String INSERT_TPL_PATH = BasicInfo.TPL_PATH + "sql/ddl/insert_sql.sql";
 
     /**
@@ -36,7 +38,7 @@ public class DdlTemplateFiller {
         String filePath = "D:\\svn\\jilin\\03.模型设计\\风险数据集市物理模型-模板.xlsx";
         filePath = "D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx";
         // 调用 genDdlSql 方法生成 DDL SQL 语句
-        genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx");
+        //genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx");
         genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-接口层.xlsx");
     }
 
