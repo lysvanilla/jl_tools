@@ -33,6 +33,11 @@ public class EtlMappingExcelRead {
             for (int i = 0; i < sheetCount; i++) {
                 EtlMapp etlMapp = new EtlMapp();
                 Sheet sheet = workbook.getSheetAt(i);
+                String sheetName = sheet.getSheetName();
+                if ("封面".equals(sheetName)||"变更记录".equals(sheetName)||"目录".equals(sheetName)){
+                    log.debug("跳过工作表:{},文件：{}", sheetName,filePath);
+                    continue;
+                }
                 // 读取表级信息
                 readEtlMappInfo(sheet, etlMapp);
 

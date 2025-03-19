@@ -150,29 +150,32 @@
             </resource>
         </resources>
         <plugins>
-            <!-- 第一个 JAR 包的配置（默认输出） -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven.jar.plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>cn.sunline.Main</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>libs/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <!-- 第二个 JAR 包的配置 -->
+            <!-- JAR 包配置 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven.jar.plugin.version}</version>
                 <executions>
+                    <!-- 默认JAR包配置 -->
                     <execution>
-                        <id>jar-with-main-class</id>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>cn.sunline.Main</mainClass>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>libs/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <!-- GUI版本JAR包配置 -->
+                    <execution>
+                        <id>jar-with-gui</id>
                         <phase>package</phase>
                         <goals>
                             <goal>jar</goal>

@@ -170,7 +170,7 @@ public class DdlTemplateFiller {
 
         String tableSchema = TEMPLATE_SETTING.get(systemModule);
         if (StringUtils.isBlank(tableSchema)){
-            log.error("归属层次[{}]未在配置对应的schema",systemModule);
+            log.error("[{}-{}]的归属层次[{}]未在配置对应的schema",tableNameEn,tableNameCn,systemModule);
             tableSchema  = "未配置";
         }
 

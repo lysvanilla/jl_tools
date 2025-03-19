@@ -1,5 +1,6 @@
 package cn.sunline;
 
+import cn.sunline.vo.Function;
 import javafx.scene.control.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +30,9 @@ import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
+
+import static cn.sunline.function.DefaultFunctionData.getDefaultFunctions;
 
 @Slf4j
 public class JavaFXInterfaceForMain extends Application {
@@ -42,46 +43,7 @@ public class JavaFXInterfaceForMain extends Application {
     private StyleClassedTextArea logTextArea;
     private Label modelFileNameLabel;
     private Label fileNameLabel; // 声明为类的成员变量
-    private static final LinkedHashMap<String, String> CHINESE_TO_ENGLISH = new LinkedHashMap<>();
-    private static final Map<String, String> FUNCTION_DESCRIPTIONS = new HashMap<>(); // 功能说明map
-
-    // 添加显式初始化方法以确保地图在UI创建前初始化
-    private void initializeMaps() {
-        // 仅在映射为空时初始化，避免重复初始化
-        if (CHINESE_TO_ENGLISH.isEmpty()) {
-            log.info("初始化功能映射...");
-            CHINESE_TO_ENGLISH.put("物理化", "wlh");
-            CHINESE_TO_ENGLISH.put("物理模型生成DDL建表语句", "ddl");
-            CHINESE_TO_ENGLISH.put("映射文档生成DML脚本", "dml");
-            CHINESE_TO_ENGLISH.put("接口层物理模型生成映射文档", "gen_mapp");
-            CHINESE_TO_ENGLISH.put("映射文档生成物理模型初稿", "gen_table");
-            CHINESE_TO_ENGLISH.put("根据物理模型补充映射文档", "supp_mapp");
-            CHINESE_TO_ENGLISH.put("更新映射文档到最新模板", "update_mapp");
-            CHINESE_TO_ENGLISH.put("根据映射文档获取模型依赖表", "get_rela_tab");
-            CHINESE_TO_ENGLISH.put("指标过程Excel文档转换标准模板", "zb");
-            CHINESE_TO_ENGLISH.put("EXCEL拆分", "cf");
-            CHINESE_TO_ENGLISH.put("EXCEL合并", "hb");
-        }
-
-        if (FUNCTION_DESCRIPTIONS.isEmpty()) {
-            log.info("初始化功能描述...");
-            FUNCTION_DESCRIPTIONS.put("物理化", "将Excel文件中的字段中文翻译为英文，并输出拆词匹配结果");
-            FUNCTION_DESCRIPTIONS.put("物理模型生成DDL建表语句", "根据物理模型Excel生成DDL建表语句、简单的insert语句");
-            FUNCTION_DESCRIPTIONS.put("映射文档生成DML脚本", "根据映射文档Excel生成DML脚本");
-            FUNCTION_DESCRIPTIONS.put("接口层物理模型生成映射文档", "根据接口层表结构生成接口层映射文档");
-            FUNCTION_DESCRIPTIONS.put("映射文档生成物理模型初稿", "根据映射文档生成物理模型初稿");
-            FUNCTION_DESCRIPTIONS.put("根据物理模型补充映射文档", "根据物理模型的表结构信息，更新映射文档中的字段英文名、过滤条件");
-            FUNCTION_DESCRIPTIONS.put("更新映射文档到最新模板", "更新已有的映射文档");
-            FUNCTION_DESCRIPTIONS.put("根据映射文档获取模型依赖表", "读取映射文档中的表关联关系中的配置的源表英文名来识别依赖关系并生成Excel");
-            FUNCTION_DESCRIPTIONS.put("指标过程Excel文档转换标准模板", "将风控指标转换为行里指标标准格式的模板");
-            FUNCTION_DESCRIPTIONS.put("EXCEL拆分", "将Excel文件按规则拆分为多个文件");
-            FUNCTION_DESCRIPTIONS.put("EXCEL合并", "将多个Excel文件合并为单一文件");
-        }
-
-        // 输出键集以进行调试
-        //System.out.println("功能映射键: " + CHINESE_TO_ENGLISH.keySet());
-        //System.out.println("功能描述键: " + FUNCTION_DESCRIPTIONS.keySet());
-    }
+    private static LinkedHashMap<String, Function> functionMap = getDefaultFunctions();
 
     private static boolean appenderAdded = false;
     private double xOffset = 0;
@@ -90,8 +52,6 @@ public class JavaFXInterfaceForMain extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // 确保映射和描述已经初始化
-        initializeMaps();
 
         VBox inputPanel = createInputPanel();
         logTextArea = createLogTextArea();
@@ -216,7 +176,7 @@ public class JavaFXInterfaceForMain extends Application {
         Label dealFunLabel = new Label("选择处理功能:");
         dealFunLabel.setFont(font);
         ObservableList<String> dealFunOptionsChinese = FXCollections.observableArrayList(
-                CHINESE_TO_ENGLISH.keySet()
+                functionMap.keySet()
         );
 
         dealFunComboBox = new ComboBox<>(dealFunOptionsChinese);
@@ -264,46 +224,9 @@ public class JavaFXInterfaceForMain extends Application {
             }
             // 更新说明标签
             updateDescriptionLabel(newValue);
+            fileNameLabel.setText(functionMap.get(newValue).getFileNameLabel());
+            modelFileNameLabel.setText(functionMap.get(newValue).getModelFileNameLabel());
 
-            // 根据下拉框的值调整 fileNameLabel 的文字显示
-            switch (newValue) {
-                case "物理化":
-                    fileNameLabel.setText("* 输入待物理化文件file_name:");
-                    break;
-                case "物理模型生成DDL建表语句":
-                    fileNameLabel.setText("* 输入物理模型文件file_name:");
-                    break;
-                case "映射文档生成DML脚本":
-                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
-                    break;
-                case "接口层物理模型生成映射文档":
-                    fileNameLabel.setText("* 输入接口层物理模型文件file_name:");
-                    break;
-                case "映射文档生成物理模型初稿":
-                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
-                    break;
-                case "根据物理模型补充映射文档":
-                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
-                    modelFileNameLabel.setText("* 输入物理模型文件model_file_name:");
-                    break;
-                case "更新映射文档到最新模板":
-                    fileNameLabel.setText("* 输入映射文档文件或者文件夹file_name:");
-                    break;
-                case "根据映射文档获取模型依赖表":
-                    fileNameLabel.setText("* 输入映射文档文件称或者文件夹file_name:");
-                    break;
-                case "指标过程Excel文档转换标准模板":
-                    fileNameLabel.setText("* 输入指标过程Excel文件file_name:");
-                    break;
-                case "EXCEL拆分":
-                    fileNameLabel.setText("* 输入待拆分Excel文件file_name:");
-                    break;
-                case "EXCEL合并":
-                    fileNameLabel.setText("* 输入待合并Excel文件file_name:");
-                    break;
-                default:
-                    fileNameLabel.setText("* 输入待物理化文件file_name:");
-            }
 
         });
 
@@ -326,7 +249,11 @@ public class JavaFXInterfaceForMain extends Application {
 
     // 添加更新说明标签的方法
     private void updateDescriptionLabel(String selectedFunction) {
-        String description = FUNCTION_DESCRIPTIONS.getOrDefault(selectedFunction, "");
+        Function function = functionMap.get(selectedFunction);
+        String description = "";
+        if (function != null) {
+            description = function.getFunctionDescriptions();
+        }
         descriptionLabel.setText(description);
     }
 
@@ -372,7 +299,7 @@ public class JavaFXInterfaceForMain extends Application {
 
     private String[] getCommandArgs() {
         String dealFunChinese = dealFunComboBox.getValue();
-        String dealFun = CHINESE_TO_ENGLISH.get(dealFunChinese);
+        String dealFun = functionMap.get(dealFunChinese).getFunctionNameEn();
         String fileName = fileNameTextField.getText();
         String modelFileName = modelFileNameTextField.getText();
 

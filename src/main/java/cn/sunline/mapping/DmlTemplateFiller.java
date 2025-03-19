@@ -24,7 +24,7 @@ import static cn.sunline.util.BasicInfo.TEMPLATE_SETTING;
 public class DmlTemplateFiller {
     // 定义导出文件的基础路径，通过 BasicInfo 类的方法获取
     public static final String BASE_EXPORT_PATH = BasicInfo.getBasicExportPath("autocode"+ File.separator+"dml");
-    private static final String TPL_PATH = System.getProperty("user.dir") + "/template/sql/dml/inceptor/";
+    private static final String TPL_PATH = BasicInfo.TPL_PATH + "sql/dml/inceptor/";
 
     // 模板文件内容
     private static final String MAIN_TPL = readTemplate(TPL_PATH + "dml_template.sql");
