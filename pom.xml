@@ -14,6 +14,13 @@
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <log4j2.version>2.17.2</log4j2.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <poi.version>5.2.3</poi.version>
+        <truelicense.version>1.33</truelicense.version>
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>4.5.1</mockito.version>
+        <jacoco.version>0.8.7</jacoco.version>
     </properties>
 
     <dependencies>
@@ -25,12 +32,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.2.3</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.3</version>
+            <version>${poi.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/cn.idev.excel/fastexcel -->
         <dependency>
@@ -42,25 +49,25 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.17.2</version>
+            <version>${log4j2.version}</version>
         </dependency>
         <!-- SLF4J 与 Log4j2 桥接依赖 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.17.2</version>
+            <version>${log4j2.version}</version>
         </dependency>
         <!-- 如果需要使用slf4j，还需要添加slf4j依赖 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <!-- Log4j2 核心依赖 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.17.2</version>
+            <version>${log4j2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -90,25 +97,25 @@
         <dependency>
             <groupId>de.schlichtherle.truelicense</groupId>
             <artifactId>truelicense-core</artifactId>
-            <version>1.33</version>
+            <version>${truelicense.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/de.schlichtherle.truelicense/truelicense-xml -->
         <dependency>
             <groupId>de.schlichtherle.truelicense</groupId>
             <artifactId>truelicense-xml</artifactId>
-            <version>1.33</version>
+            <version>${truelicense.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/de.schlichtherle.truelicense/truelicense-swing -->
         <dependency>
             <groupId>de.schlichtherle.truelicense</groupId>
             <artifactId>truelicense-swing</artifactId>
-            <version>1.33</version>
+            <version>${truelicense.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/de.schlichtherle.truelicense/truelicense -->
         <dependency>
             <groupId>de.schlichtherle.truelicense</groupId>
             <artifactId>truelicense</artifactId>
-            <version>1.33</version>
+            <version>${truelicense.version}</version>
             <type>pom</type>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.fxmisc.richtext/richtextfx -->
@@ -122,6 +129,19 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.46.0.1</version>
+        </dependency>
+        <!-- 测试依赖 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -219,6 +239,49 @@
                     <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+            </plugin>
+            <!-- 添加代码质量检查插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- 添加代码覆盖率检查插件 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

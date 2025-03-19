@@ -1,20 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+        <Property name="LOG_HOME">logs</Property>
+    </Properties>
+
     <Appenders>
         <!-- 控制台输出 -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
-        <!-- 文件输出
-        <File name="File" fileName="${LOG_HOME}/app.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
-        </File>-->
+        
+        <!-- 滚动文件输出 -->
+        <RollingFile name="RollingFile" fileName="${LOG_HOME}/app.log"
+                     filePattern="${LOG_HOME}/app-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        
+        <!-- 错误日志单独记录 -->
+        <RollingFile name="ErrorFile" fileName="${LOG_HOME}/error.log"
+                     filePattern="${LOG_HOME}/error-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+        
+        <!-- 异步处理 -->
+        <Async name="Async">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
     </Appenders>
+    
     <Loggers>
-        <Root level="info">
-            <!-- 同时输出到控制台和文件 -->
+        <!-- 应用日志配置 -->
+        <Logger name="cn.sunline" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
-            <!-- <AppenderRef ref="File"/>-->
+            <AppenderRef ref="Async"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+        
+        <!-- 第三方库日志级别 -->
+        <Logger name="org.apache" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Async"/>
+        </Logger>
+        
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Async"/>
+            <AppenderRef ref="ErrorFile"/>
         </Root>
     </Loggers>
 </Configuration>
