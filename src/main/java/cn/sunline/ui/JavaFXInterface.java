@@ -14,6 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
@@ -26,6 +29,7 @@ import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +51,7 @@ public class JavaFXInterface extends Application {
     private TextField fileNameField;
     private TextField modelFileNameField;
     private Label modelFileNameLabel;
-    private TextArea logArea;
+    private StyleClassedTextArea logArea;
     private Label descriptionLabel; // 功能说明标签
     private static final String APPENDER_NAME = "JavaFXTextAreaAppender";
     private PipedOutputStream pipeOut;
@@ -106,11 +110,17 @@ public class JavaFXInterface extends Application {
         Button executeButton = new Button("执行");
         executeButton.setOnAction(e -> executeFunction());
         
-        // 日志显示区域
-        logArea = new TextArea();
+        // 日志显示区域 - 使用支持样式的StyleClassedTextArea
+        logArea = new StyleClassedTextArea();
         logArea.setEditable(false);
-        logArea.setPrefRowCount(30);
+        // StyleClassedTextArea没有setPrefRowCount方法，使用setPrefHeight代替
+        logArea.setPrefHeight(400);
+        logArea.setWrapText(false); // 关闭自动换行，使日志内容可以水平滚动
         VBox.setVgrow(logArea, Priority.ALWAYS); // 使日志区域占据剩余空间
+        
+        // 应用CSS样式
+        logArea.getStylesheets().add(getClass().getResource("/log-styles.css").toExternalForm());
+        logArea.getStyleClass().add("log-area");
         
         // 添加组件到布局
         root.getChildren().addAll(
@@ -135,7 +145,7 @@ public class JavaFXInterface extends Application {
         primaryStage.show();
         
         // 直接向logArea添加第一条消息
-        logArea.appendText("应用程序启动中... - " + new java.util.Date() + "\n");
+        //appendToLog("应用程序启动中... - " + new java.util.Date() + "\n", false);
         
         // 先配置Log4j Appender，再配置控制台捕获
         // 这个顺序很重要，确保Log4j优先配置
@@ -143,9 +153,24 @@ public class JavaFXInterface extends Application {
         setupConsoleCapture();
         
         // 测试日志输出
-        log.info("UI界面初始化完成");
-        log.debug("这是一条调试信息");
-        System.out.println("这是一条控制台输出信息");
+        //log.info("UI界面初始化完成");
+    }
+    
+    /**
+     * 向日志区域添加文本
+     */
+    private void appendToLog(String message, boolean isError) {
+        Platform.runLater(() -> {
+            int startPosition = logArea.getLength();
+            logArea.appendText(message);
+            if (isError) {
+                logArea.setStyleClass(startPosition, logArea.getLength(), "error-text");
+            } else {
+                logArea.setStyleClass(startPosition, logArea.getLength(), "normal-text");
+            }
+            logArea.moveTo(logArea.getLength());
+            logArea.requestFollowCaret();
+        });
     }
     
     /**
@@ -186,15 +211,13 @@ public class JavaFXInterface extends Application {
             context.updateLoggers();
             
             // 直接向logArea添加信息，确保至少能看到这条信息
-            Platform.runLater(() -> {
-                logArea.appendText("日志系统已初始化 - " + new java.util.Date() + "\n");
-            });
+            //appendToLog("日志系统已初始化 - " + new java.util.Date() + "\n", false);
             
-            log.info("Log4j日志重定向配置完成");
+            //log.info("Log4j日志重定向配置完成");
             
         } catch (Exception e) {
             // 如果配置失败，至少在UI上显示错误信息
-            logArea.appendText("配置日志重定向失败: " + e.getMessage() + "\n");
+            appendToLog("配置日志重定向失败: " + e.getMessage() + "\n", true);
             e.printStackTrace();
         }
     }
@@ -202,13 +225,13 @@ public class JavaFXInterface extends Application {
     /**
      * 自定义Log4j Appender，将日志输出到TextArea
      */
-    private static class TextAreaAppender extends AbstractAppender {
-        private final TextArea textArea;
+    private class TextAreaAppender extends AbstractAppender {
+        private final StyleClassedTextArea textArea;
         
         protected TextAreaAppender(String name, 
                                   org.apache.logging.log4j.core.Filter filter, 
                                   Layout<? extends Serializable> layout,
-                                  TextArea textArea) {
+                                  StyleClassedTextArea textArea) {
             super(name, filter, layout, true, null);
             this.textArea = textArea;
         }
@@ -218,17 +241,12 @@ public class JavaFXInterface extends Application {
             if (textArea != null) {
                 try {
                     // 使用布局格式化日志事件
-                    String formattedMessage = new String(getLayout().toByteArray(event));
+                    final String formattedMessage = new String(getLayout().toByteArray(event));
+                    final boolean isError = event.getLevel().equals(org.apache.logging.log4j.Level.ERROR);
                     
-                    // 在JavaFX应用程序线程中更新UI
-                    Platform.runLater(() -> {
-                        try {
-                            textArea.appendText(formattedMessage);
-                            textArea.setScrollTop(Double.MAX_VALUE); // 自动滚动到底部
-                        } catch (Exception e) {
-                            System.err.println("向TextArea添加日志失败: " + e.getMessage());
-                        }
-                    });
+                    // 调用辅助方法添加日志，设置适当的颜色
+                    appendToLog(formattedMessage, isError);
+                    
                 } catch (Exception e) {
                     System.err.println("格式化日志事件失败: " + e.getMessage());
                 }
@@ -252,10 +270,8 @@ public class JavaFXInterface extends Application {
                     String line;
                     while ((line = br.readLine()) != null) {
                         final String text = line;
-                        Platform.runLater(() -> {
-                            logArea.appendText("[STDOUT] " + text + "\n");
-                            logArea.setScrollTop(Double.MAX_VALUE); // 自动滚动到底部
-                        });
+                        // 使用普通样式显示控制台输出
+                        appendToLog("[STDOUT] " + text + "\n", false);
                     }
                 } catch (IOException e) {
                     if (!(e instanceof java.io.InterruptedIOException)) {
@@ -274,10 +290,10 @@ public class JavaFXInterface extends Application {
             System.setErr(new PrintStream(new TeeOutputStream(originalErr, pipeOut), true));
             
             // 输出初始信息
-            System.out.println("控制台输出已重定向到界面");
+            //System.out.println("控制台输出已重定向到界面");
             
         } catch (Exception e) {
-            logArea.appendText("设置控制台捕获失败: " + e.getMessage() + "\n");
+            appendToLog("设置控制台捕获失败: " + e.getMessage() + "\n", true);
             e.printStackTrace();
         }
     }
@@ -356,46 +372,44 @@ public class JavaFXInterface extends Application {
         try {
             // 清空日志区域
             logArea.clear();
-            logArea.appendText("===== 开始执行功能 =====\n");
+            appendToLog("===== 开始执行功能 =====\n", false);
             
             String selectedFunction = functionComboBox.getValue();
             log.info("开始执行功能: {}", selectedFunction);
-            System.out.println("开始执行功能: " + selectedFunction);
+            //System.out.println("开始执行功能: " + selectedFunction);
             
             String fileName = fileNameField.getText();
             String modelFileName = modelFileNameField.isVisible() ? modelFileNameField.getText() : "";
             
             // 记录执行参数
             log.info("执行参数 - 文件名: {}, 模型文件名: {}", fileName, modelFileName);
-            System.out.println("执行参数 - 文件名: " + fileName + ", 模型文件名: " + modelFileName);
+            //System.out.println("执行参数 - 文件名: " + fileName + ", 模型文件名: " + modelFileName);
             
             // 调用服务层处理业务逻辑 - 将在单独的线程中执行以避免UI阻塞
             new Thread(() -> {
                 try {
-                    System.out.println("线程开始执行...");
+                    //System.out.println("线程开始执行...");
                     functionService.executeFunction(selectedFunction, fileName, modelFileName);
                     Platform.runLater(() -> {
-                        logArea.appendText("===== 功能执行成功 =====\n");
+                        //appendToLog("===== 功能执行成功 =====\n", false);
                         log.info("功能执行成功");
-                        System.out.println("功能执行成功");
                     });
                 } catch (Exception e) {
                     final String errorMsg = e.getMessage();
                     Platform.runLater(() -> {
-                        logArea.appendText("===== 功能执行失败 =====\n");
-                        logArea.appendText("错误信息: " + errorMsg + "\n");
+                        //appendToLog("===== 功能执行失败 =====\n", true);
+                        //appendToLog("错误信息: " + errorMsg + "\n", true);
                         log.error("功能执行失败: {}", errorMsg, e);
-                        System.err.println("功能执行失败: " + errorMsg);
                         e.printStackTrace(System.err);
                         ExceptionHandler.handle(e);
                     });
                 }
             }).start();
         } catch (Exception e) {
-            logArea.appendText("===== 功能执行准备失败 =====\n");
-            logArea.appendText("错误信息: " + e.getMessage() + "\n");
+            //appendToLog("===== 功能执行准备失败 =====\n", true);
+            //appendToLog("错误信息: " + e.getMessage() + "\n", true);
             log.error("功能执行失败: {}", e.getMessage(), e);
-            System.err.println("功能执行失败: " + e.getMessage());
+            //System.err.println("功能执行失败: " + e.getMessage());
             e.printStackTrace(System.err);
             ExceptionHandler.handle(e);
         }
