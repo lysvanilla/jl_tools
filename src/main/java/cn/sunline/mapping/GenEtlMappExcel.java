@@ -77,7 +77,7 @@ public class GenEtlMappExcel {
                 // 写入文件
                 wb.write(out);
                 out.flush();
-                System.out.println("生成sheet完成：" + sheetName);
+                log.info("生成sheet完成：[{}]" ,sheetName);
             } catch (IOException e) {
                 System.err.println("处理文件 " + temp_deal_file + " 时发生错误: " + e.getMessage());
                 e.printStackTrace();

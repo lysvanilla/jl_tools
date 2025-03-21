@@ -203,7 +203,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>cn.sunline.JavaFXInterfaceForMain</mainClass>
+                                    <mainClass>cn.sunline.ui.JavaFXInterface</mainClass>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>libs/</classpathPrefix>
                                 </manifest>

@@ -274,12 +274,16 @@ public class JavaFXInterface extends Application {
                         appendToLog("[STDOUT] " + text + "\n", false);
                     }
                 } catch (IOException e) {
-                    if (!(e instanceof java.io.InterruptedIOException)) {
-                        e.printStackTrace();
+                    // 忽略管道断开异常 - 这通常发生在应用程序关闭时或执行结束时
+                    if (!(e instanceof java.io.InterruptedIOException) && 
+                        !e.getMessage().contains("Pipe broken") && 
+                        !e.getMessage().contains("Stream closed")) {
+                        log.warn("控制台捕获异常: {}", e.getMessage());
                     }
                 }
             });
             reader.setDaemon(true);
+            reader.setName("Console-Capture-Thread");
             reader.start();
             
             // 重定向标准输出和错误输出 - 但不覆盖Log4j的配置
@@ -294,12 +298,12 @@ public class JavaFXInterface extends Application {
             
         } catch (Exception e) {
             appendToLog("设置控制台捕获失败: " + e.getMessage() + "\n", true);
-            e.printStackTrace();
+            log.error("设置控制台捕获失败", e);
         }
     }
     
     /**
-     * 辅助类：同时输出到两个流
+     * 辅助类：同时输出到两个流，具有更好的错误处理机制
      */
     private static class TeeOutputStream extends OutputStream {
         private final OutputStream out1;
@@ -312,34 +316,76 @@ public class JavaFXInterface extends Application {
         
         @Override
         public void write(int b) throws IOException {
-            out1.write(b);
-            out2.write(b);
+            try {
+                out1.write(b);
+            } catch (IOException e) {
+                // 忽略第一个流的错误
+            }
+            
+            try {
+                out2.write(b);
+            } catch (IOException e) {
+                // 忽略第二个流的错误
+            }
         }
         
         @Override
         public void write(byte[] b) throws IOException {
-            out1.write(b);
-            out2.write(b);
+            try {
+                out1.write(b);
+            } catch (IOException e) {
+                // 忽略第一个流的错误
+            }
+            
+            try {
+                out2.write(b);
+            } catch (IOException e) {
+                // 忽略第二个流的错误
+            }
         }
         
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            out1.write(b, off, len);
-            out2.write(b, off, len);
+            try {
+                out1.write(b, off, len);
+            } catch (IOException e) {
+                // 忽略第一个流的错误
+            }
+            
+            try {
+                out2.write(b, off, len);
+            } catch (IOException e) {
+                // 忽略第二个流的错误
+            }
         }
         
         @Override
         public void flush() throws IOException {
-            out1.flush();
-            out2.flush();
+            try {
+                out1.flush();
+            } catch (IOException e) {
+                // 忽略第一个流的错误
+            }
+            
+            try {
+                out2.flush();
+            } catch (IOException e) {
+                // 忽略第二个流的错误
+            }
         }
         
         @Override
         public void close() throws IOException {
             try {
                 out1.close();
-            } finally {
+            } catch (IOException e) {
+                // 忽略关闭第一个流的错误
+            }
+            
+            try {
                 out2.close();
+            } catch (IOException e) {
+                // 忽略关闭第二个流的错误
             }
         }
     }
