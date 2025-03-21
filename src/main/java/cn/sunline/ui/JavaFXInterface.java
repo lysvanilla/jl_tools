@@ -10,9 +10,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
@@ -46,6 +50,7 @@ public class JavaFXInterface extends Application {
     private static final String APPENDER_NAME = "JavaFXTextAreaAppender";
     private PipedOutputStream pipeOut;
     private PipedInputStream pipeIn;
+    private Button browseModelButton;
 
     @Override
     public void start(Stage primaryStage) {
@@ -55,8 +60,14 @@ public class JavaFXInterface extends Application {
         functionService = new FunctionService();
         
         // 创建界面组件
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(10));
+        VBox root = new VBox(12); // 减少组件间距
+        root.setPadding(new Insets(12));
+        root.getStyleClass().add("root");
+        
+        // 功能面板容器
+        VBox functionPanel = new VBox(10);
+        functionPanel.getStyleClass().add("panel");
+        functionPanel.setPadding(new Insets(12));
         
         // 功能选择区域（包含下拉框和说明标签）
         HBox functionSelectionBox = new HBox(10);
@@ -65,9 +76,10 @@ public class JavaFXInterface extends Application {
         // 功能标签和下拉框
         Label functionLabel = new Label("选择功能:");
         functionLabel.setMinHeight(Control.USE_PREF_SIZE); // 确保标签高度适合内容
+        functionLabel.setPrefWidth(100); // 减少标签宽度
         
         functionComboBox = new ComboBox<>();
-        functionComboBox.setPrefWidth(200);
+        functionComboBox.setPrefWidth(220); // 减少宽度
         functionComboBox.getItems().addAll(functionService.getAllFunctionNames());
         // 增加可见行数，使下拉列表显示更多选项
         functionComboBox.setVisibleRowCount(15);
@@ -77,6 +89,7 @@ public class JavaFXInterface extends Application {
         descriptionLabel = new Label();
         descriptionLabel.setWrapText(true); // 允许文本换行
         descriptionLabel.setMinHeight(Control.USE_PREF_SIZE); // 确保标签高度适合内容
+        descriptionLabel.getStyleClass().add("description-label");
         HBox.setHgrow(descriptionLabel, Priority.ALWAYS); // 让描述标签占据剩余空间
         
         // 添加到功能选择区域
@@ -88,23 +101,96 @@ public class JavaFXInterface extends Application {
             updateFunctionDescription(newVal);
         });
         
+        // 添加分隔线
+        TilePane separator = new TilePane();
+        separator.setPrefHeight(1);
+        separator.setStyle("-fx-background-color: #e0e0e0;");
+        separator.setPadding(new Insets(0, 0, 0, 0));
+        separator.setMaxWidth(Double.MAX_VALUE);
+        
+        // 文件输入区域
+        GridPane inputGrid = new GridPane();
+        inputGrid.setHgap(10);
+        inputGrid.setVgap(10);
+        inputGrid.setPadding(new Insets(5, 0, 5, 0));
+        
+        // 设置列宽
+        ColumnConstraints labelCol = new ColumnConstraints();
+        labelCol.setMinWidth(100);
+        labelCol.setPrefWidth(100);
+        
+        ColumnConstraints fieldCol = new ColumnConstraints();
+        fieldCol.setHgrow(Priority.ALWAYS);
+        fieldCol.setFillWidth(true);
+        fieldCol.setPrefWidth(220); // 与ComboBox宽度相同
+        
+        ColumnConstraints buttonCol = new ColumnConstraints();
+        buttonCol.setMinWidth(70);
+        buttonCol.setMaxWidth(70);
+        
+        inputGrid.getColumnConstraints().addAll(labelCol, fieldCol, buttonCol);
+        
         // 文件名输入框
         Label fileNameLabel = new Label("输入文件名:");
         fileNameField = new TextField();
-
+        fileNameField.setPromptText("请输入文件路径或名称");
+        fileNameField.setPrefWidth(220); // 与ComboBox宽度相同
+        
+        // 添加浏览按钮
+        Button browseButton = new Button("浏览");
+        browseButton.setPrefWidth(60);
+        browseButton.setOnAction(e -> browseFile(fileNameField));
+        
+        // 添加文件输入组件到网格
+        inputGrid.add(fileNameLabel, 0, 0);
+        inputGrid.add(fileNameField, 1, 0);
+        inputGrid.add(browseButton, 2, 0);
+        
         // 模型文件名输入框（可选）
         modelFileNameLabel = new Label("输入模型文件名:");
         modelFileNameField = new TextField();
+        modelFileNameField.setPromptText("请输入模型文件路径或名称");
+        modelFileNameField.setPrefWidth(220); // 与ComboBox宽度相同
+        
+        // 添加模型文件浏览按钮
+        browseModelButton = new Button("浏览");
+        browseModelButton.setPrefWidth(60);
+        browseModelButton.setOnAction(e -> browseFile(modelFileNameField));
+        
+        // 添加模型文件输入组件到网格
+        inputGrid.add(modelFileNameLabel, 0, 1);
+        inputGrid.add(modelFileNameField, 1, 1);
+        inputGrid.add(browseModelButton, 2, 1);
+        
+        // 执行按钮区域
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonBox.setPadding(new Insets(5, 0, 0, 0));
         
         // 执行按钮
         Button executeButton = new Button("执行");
+        executeButton.setPrefWidth(90);
         executeButton.setOnAction(e -> executeFunction());
+        
+        buttonBox.getChildren().add(executeButton);
+        
+        // 将所有元素添加到功能面板
+        functionPanel.getChildren().addAll(functionSelectionBox, separator, inputGrid, buttonBox);
+        
+        // 日志区域容器
+        VBox logPanel = new VBox(5);
+        logPanel.getStyleClass().add("log-panel");
+        logPanel.setPadding(new Insets(10));
+        VBox.setVgrow(logPanel, Priority.ALWAYS);
+        
+        // 日志区域标题
+        Label logLabel = new Label("执行日志");
+        logLabel.getStyleClass().add("title-label");
         
         // 日志显示区域 - 使用支持样式的StyleClassedTextArea
         logArea = new StyleClassedTextArea();
         logArea.setEditable(false);
-        // StyleClassedTextArea没有setPrefRowCount方法，使用setPrefHeight代替
-        logArea.setPrefHeight(400);
+        logArea.setPrefHeight(280); // 减少高度
         logArea.setWrapText(false); // 关闭自动换行，使日志内容可以水平滚动
         VBox.setVgrow(logArea, Priority.ALWAYS); // 使日志区域占据剩余空间
         
@@ -112,13 +198,11 @@ public class JavaFXInterface extends Application {
         logArea.getStylesheets().add(getClass().getResource("/log-styles.css").toExternalForm());
         logArea.getStyleClass().add("log-area");
         
-        // 添加组件到布局
-        root.getChildren().addAll(
-            functionSelectionBox,
-            fileNameLabel, fileNameField,
-            modelFileNameLabel, modelFileNameField,
-            executeButton, logArea
-        );
+        // 添加日志组件到日志面板
+        logPanel.getChildren().addAll(logLabel, logArea);
+        
+        // 添加所有面板到根布局
+        root.getChildren().addAll(functionPanel, logPanel);
         
         // 初始化模型文件输入框的可见性和功能说明
         updateModelFileVisibility(functionComboBox.getValue());
@@ -126,24 +210,67 @@ public class JavaFXInterface extends Application {
         
         // 设置场景
         int width = AppConfig.getIntProperty("ui.window.width", 800);
-        int height = AppConfig.getIntProperty("ui.window.height", 600);
+        int height = AppConfig.getIntProperty("ui.window.height", 700); // 增加高度
         Scene scene = new Scene(root, width, height);
+        scene.getStylesheets().add(getClass().getResource("/log-styles.css").toExternalForm());
         
         // 直接使用硬编码标题，避免配置文件编码问题
         primaryStage.setTitle("风险数据集市自动化工具");
+        
+        // 设置应用程序图标
+        try {
+            javafx.scene.image.Image icon = new javafx.scene.image.Image(getClass().getResourceAsStream("/images/app_icon.png"));
+            primaryStage.getIcons().add(icon);
+        } catch (Exception e) {
+            log.warn("无法加载应用图标: {}", e.getMessage());
+        }
+        
         primaryStage.setScene(scene);
         primaryStage.show();
-        
-        // 直接向logArea添加第一条消息
-        //appendToLog("应用程序启动中... - " + new java.util.Date() + "\n", false);
         
         // 先配置Log4j Appender，再配置控制台捕获
         // 这个顺序很重要，确保Log4j优先配置
         setupLog4jAppender();
         setupConsoleCapture();
         
-        // 测试日志输出
-        //log.info("UI界面初始化完成");
+        // 输出欢迎信息
+        appendToLog("=== 欢迎使用风险数据集市自动化工具 ===\n", false);
+        appendToLog("请选择功能并输入必要参数后点击\"执行\"按钮\n\n", false);
+    }
+    
+    /**
+     * 打开文件选择对话框
+     */
+    private void browseFile(TextField targetField) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择文件");
+        
+        // 添加常用文件过滤器
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Excel文件", "*.xlsx", "*.xls"),
+            new FileChooser.ExtensionFilter("CSV文件", "*.csv"),
+            new FileChooser.ExtensionFilter("文本文件", "*.txt"),
+            new FileChooser.ExtensionFilter("所有文件", "*.*")
+        );
+        
+        // 获取上次目录
+        String lastDir = AppConfig.getProperty("ui.last.directory");
+        if (lastDir != null && !lastDir.isEmpty()) {
+            File initialDir = new File(lastDir);
+            if (initialDir.exists() && initialDir.isDirectory()) {
+                fileChooser.setInitialDirectory(initialDir);
+            }
+        }
+        
+        // 显示对话框
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            targetField.setText(selectedFile.getAbsolutePath());
+            
+            // 保存目录供下次使用 - AppConfig没有提供setProperty方法，此处仅保存文件路径到文本框
+            //AppConfig.setProperty("ui.last.directory", selectedFile.getParent());
+            // 在后续版本可以实现配置的保存功能
+        }
     }
     
     /**
@@ -260,8 +387,8 @@ public class JavaFXInterface extends Application {
                     String line;
                     while ((line = br.readLine()) != null) {
                         final String text = line;
-                        // 使用普通样式显示控制台输出
-                        appendToLog("[STDOUT] " + text + "\n", false);
+                        // 使用普通样式显示控制台输出，不添加前缀
+                        appendToLog(text + "\n", false);
                     }
                 } catch (IOException e) {
                     // 忽略管道断开异常 - 这通常发生在应用程序关闭时或执行结束时
@@ -282,10 +409,6 @@ public class JavaFXInterface extends Application {
             
             System.setOut(new PrintStream(new TeeOutputStream(originalOut, pipeOut), true));
             System.setErr(new PrintStream(new TeeOutputStream(originalErr, pipeOut), true));
-            
-            // 输出初始信息
-            //System.out.println("控制台输出已重定向到界面");
-            
         } catch (Exception e) {
             appendToLog("设置控制台捕获失败: " + e.getMessage() + "\n", true);
             log.error("设置控制台捕获失败", e);
@@ -390,6 +513,8 @@ public class JavaFXInterface extends Application {
         modelFileNameLabel.setManaged(isVisible); // 设置managed属性以便在不可见时不占用布局空间
         modelFileNameField.setVisible(isVisible);
         modelFileNameField.setManaged(isVisible);
+        browseModelButton.setVisible(isVisible);
+        browseModelButton.setManaged(isVisible);
         
         log.debug("功能[{}]的模型文件输入框可见性设置为: {}", functionName, isVisible);
     }
@@ -412,41 +537,42 @@ public class JavaFXInterface extends Application {
             
             String selectedFunction = functionComboBox.getValue();
             log.info("开始执行功能: {}", selectedFunction);
-            //System.out.println("开始执行功能: " + selectedFunction);
             
             String fileName = fileNameField.getText();
             String modelFileName = modelFileNameField.isVisible() ? modelFileNameField.getText() : "";
             
             // 记录执行参数
             log.info("执行参数 - 文件名: {}, 模型文件名: {}", fileName, modelFileName);
-            //System.out.println("执行参数 - 文件名: " + fileName + ", 模型文件名: " + modelFileName);
             
             // 调用服务层处理业务逻辑 - 将在单独的线程中执行以避免UI阻塞
             new Thread(() -> {
                 try {
-                    //System.out.println("线程开始执行...");
                     functionService.executeFunction(selectedFunction, fileName, modelFileName);
                     Platform.runLater(() -> {
-                        //appendToLog("===== 功能执行成功 =====\n", false);
                         log.info("功能执行成功");
+                        appendToLog("===== 功能执行成功 =====\n", false);
                     });
                 } catch (Exception e) {
                     final String errorMsg = e.getMessage();
                     Platform.runLater(() -> {
-                        //appendToLog("===== 功能执行失败 =====\n", true);
-                        //appendToLog("错误信息: " + errorMsg + "\n", true);
+                        // 只记录一次错误日志，避免重复
                         log.error("功能执行失败: {}", errorMsg, e);
-                        e.printStackTrace(System.err);
-                        ExceptionHandler.handle(e);
+                        appendToLog("===== 功能执行失败 =====\n", true);
+                        appendToLog("错误信息: " + errorMsg + "\n", true);
+                        
+                        // 移除重复的错误输出
+                        // e.printStackTrace(System.err); // 移除重复的堆栈输出
+                        ExceptionHandler.handle(e); // 保留异常处理
                     });
                 }
             }).start();
         } catch (Exception e) {
-            //appendToLog("===== 功能执行准备失败 =====\n", true);
-            //appendToLog("错误信息: " + e.getMessage() + "\n", true);
-            log.error("功能执行失败: {}", e.getMessage(), e);
-            //System.err.println("功能执行失败: " + e.getMessage());
-            e.printStackTrace(System.err);
+            log.error("功能执行准备失败: {}", e.getMessage(), e);
+            appendToLog("===== 功能执行准备失败 =====\n", true);
+            appendToLog("错误信息: " + e.getMessage() + "\n", true);
+            
+            // 移除重复的错误输出
+            // e.printStackTrace(System.err);
             ExceptionHandler.handle(e);
         }
     }

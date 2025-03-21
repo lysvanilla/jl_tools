@@ -1,15 +1,148 @@
 .error-text {
-    -fx-fill: red;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold; /* 添加这行让文本加粗 */
+    -fx-fill: #e53935;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
 }
 
 .normal-text {
-    -fx-fill: black;
-    -fx-font-size: 16px;
+    -fx-fill: #333333;
+    -fx-font-size: 11px;
 }
 
 .log-area {
-    -fx-font-family: "Consolas", "Microsoft YaHei", monospace;
-    -fx-font-size: 16px;
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 11px;
+    -fx-background-color: #fafafa;
+    -fx-background-radius: 3px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 3px;
+}
+
+/* 添加全局样式 */
+.root {
+    -fx-background-color: #f5f5f5;
+    -fx-font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 标签样式 */
+.label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #424242;
+}
+
+/* 功能描述标签 */
+.description-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #757575;
+    -fx-font-style: italic;
+}
+
+/* 输入框样式 */
+.text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 3px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px;
+    -fx-font-size: 11px;
+}
+
+.text-field:focused {
+    -fx-border-color: #2196f3;
+    -fx-effect: dropshadow(three-pass-box, rgba(33, 150, 243, 0.4), 2, 0, 0, 0);
+}
+
+/* 下拉框样式 */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 3px;
+    -fx-padding: 0;
+    -fx-font-size: 11px;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 3px 8px;
+}
+
+.combo-box:hover {
+    -fx-border-color: #bdbdbd;
+}
+
+.combo-box:focused {
+    -fx-border-color: #2196f3;
+}
+
+/* 按钮样式 */
+.button {
+    -fx-background-color: #2196f3;
+    -fx-text-fill: white;
+    -fx-font-weight: normal;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 1, 0, 0, 1);
+    -fx-font-size: 11px;
+}
+
+.button:hover {
+    -fx-background-color: #1976d2;
+}
+
+.button:pressed {
+    -fx-background-color: #0d47a1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 1, 0, 0, 0);
+}
+
+/* 面板样式 */
+.panel {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 0);
+    -fx-padding: 10px;
+}
+
+/* 日志区域面板 */
+.log-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+}
+
+/* 标题样式 */
+.title-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #424242;
+    -fx-padding: 0 0 5px 0;
+}
+
+/* 滚动条样式 */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: #fafafa;
+    -fx-pref-width: 8px;
+    -fx-pref-height: 8px;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #bdbdbd;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #9e9e9e;
+}
+
+/* 设置滚动条箭头按钮为隐藏 */
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-opacity: 0;
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
 }
