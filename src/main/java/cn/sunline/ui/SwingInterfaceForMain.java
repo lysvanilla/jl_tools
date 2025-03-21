@@ -1,5 +1,6 @@
-package cn.sunline;
+package cn.sunline.ui;
 
+import cn.sunline.Main;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;

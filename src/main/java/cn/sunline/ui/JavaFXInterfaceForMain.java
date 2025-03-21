@@ -1,5 +1,6 @@
-package cn.sunline;
+package cn.sunline.ui;
 
+import cn.sunline.Main;
 import cn.sunline.vo.Function;
 import javafx.scene.control.*;
 import lombok.extern.slf4j.Slf4j;

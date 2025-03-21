@@ -19,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         // 输出当前编译版本
-        log.info("当前编译版本：{}", VERSION);
+        log.info("current version:{}", VERSION);
 
         // 处理无参数或 help 参数的情况
         if (args.length == 0 || isHelpArgument(args[0])) {

@@ -57,12 +57,45 @@
             <configuration>
               <archive>
                 <manifest>
-                  <mainClass>cn.sunline.JavaFXInterfaceForMain</mainClass>
+                  <mainClass>cn.sunline.ui.JavaFXInterface</mainClass>
                   <addClasspath>true</addClasspath>
                   <classpathPrefix>libs/</classpathPrefix>
                 </manifest>
               </archive>
               <classifier>gui</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <id>create-fat-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>fat-jar</shadedClassifierName>
+              <transformers>
+                <transformer>
+                  <mainClass>cn.sunline.ui.JavaFXInterface</mainClass>
+                </transformer>
+                <transformer />
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
@@ -92,41 +125,6 @@
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.4.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer>
-                  <mainClass>cn.sunline.Main</mainClass>
-                </transformer>
-              </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-              <artifactSet>
-                <includes>
-                  <include>**</include>
-                </includes>
-              </artifactSet>
-              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-allinone.jar</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -143,12 +141,51 @@
       <type>pom</type>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hamcrest-core</artifactId>
+          <groupId>org.hamcrest</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>4.5.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>byte-buddy</artifactId>
+          <groupId>net.bytebuddy</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>byte-buddy-agent</artifactId>
+          <groupId>net.bytebuddy</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>objenesis</artifactId>
+          <groupId>org.objenesis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   <properties>
-    <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
-    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>8</maven.compiler.source>
+    <poi.version>5.2.3</poi.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <junit.version>4.13.2</junit.version>
     <maven.compiler.target>8</maven.compiler.target>
+    <truelicense.version>1.33</truelicense.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jacoco.version>0.8.7</jacoco.version>
+    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+    <mockito.version>4.5.1</mockito.version>
+    <maven.compiler.source>8</maven.compiler.source>
+    <log4j2.version>2.17.2</log4j2.version>
+    <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
   </properties>
 </project>
