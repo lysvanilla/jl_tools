@@ -95,14 +95,32 @@ public class SupplementMappExcel {
                     String sourceTableEnglishName = etlGroupColMapp.getSourceTableEnglishName();
                     String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
                     TableFieldInfo tableFieldInfo = fieldCnMap.get(targetFieldChineseName);
-                    if (sourceTableEnglishNameLower.startsWith("c_") || sourceTableEnglishNameLower.startsWith("m_")){
-                        etlGroupColMapp.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
-                    }
                     if (tableFieldInfo == null){
                         continue;
                     }else{
                         etlGroupColMapp.setTargetFieldEnglishName(tableFieldInfo.getFieldNameEn());
                     }
+
+                    if (targetFieldChineseName.equals("法人机构编码")||targetFieldChineseName.equals("法人机构编号")){
+                        etlGroupColMapp.setTargetFieldEnglishName("LPR_ORG_ID");
+                        etlGroupColMapp.setTargetFieldChineseName("法人机构编号");
+                    }else if (targetFieldChineseName.equals("源表名称")){
+                        String mappingRule = etlGroupColMapp.getMappingRule();
+                        if (StringUtils.isNotBlank(mappingRule) ){
+                            String mappingRuleTmp = mappingRule;
+                            if (!mappingRuleTmp.startsWith("'")){
+                                mappingRuleTmp = "''"+mappingRuleTmp;
+                            }
+                            if (!mappingRuleTmp.endsWith("'")){
+                                mappingRuleTmp = mappingRuleTmp+"'";
+                            }
+                            etlGroupColMapp.setMappingRule(mappingRuleTmp);
+                        }
+                    }
+                    if (sourceTableEnglishNameLower.startsWith("c_") || sourceTableEnglishNameLower.startsWith("m_")){
+                        etlGroupColMapp.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
+                    }
+
                 }
 
                 List<EtlGroupJoinInfo> etlGroupJoinInfoList = etlGroup.getEtlGroupJoinInfoList();

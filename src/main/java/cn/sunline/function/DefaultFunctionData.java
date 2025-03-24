@@ -29,7 +29,7 @@ public class DefaultFunctionData {
                 "* 输入接口层物理模型文件file_name:");
         Function genTableFunction = new Function("映射文档生成物理模型初稿", "gen_table",
                 "根据映射文档生成物理模型初稿",
-                "* 输入映射文档文件或者文件夹file_name:");
+                "* 输入映射文档文件或者文件夹file_name:","* 输入物理模型文件model_file_name:");
         Function suppMappFunction = new Function("根据物理模型补充映射文档", "supp_mapp",
                 "根据物理模型的表结构信息，更新映射文档中的字段英文名、过滤条件",
                 "* 输入映射文档文件或者文件夹file_name:","* 输入物理模型文件model_file_name:");

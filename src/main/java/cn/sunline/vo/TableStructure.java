@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class TableStructure {
+    private static final long serialVersionUID = 1L;
     // Excel映射属性
     @ExcelProperty("序号")
     private String id;
@@ -76,6 +77,19 @@ public class TableStructure {
         fields.add(field);
         fieldMap.put(field.getFieldNameEn(), field);
         fieldCnMap.put(field.getFieldNameCn(), field);
+    }
+
+    // 清空 fields 和 fieldMap 的方法
+    public void clearFieldsAndFieldMap() {
+        if (fields != null) {
+            fields.clear();
+        }
+        if (fieldMap != null) {
+            fieldMap.clear();
+        }
+        if (fieldCnMap != null) {
+            fieldCnMap.clear();
+        }
     }
 
 

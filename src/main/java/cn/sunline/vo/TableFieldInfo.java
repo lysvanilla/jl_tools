@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TableFieldInfo {
+    private static final long serialVersionUID = 1L;
     // Excel映射属性
     @ExcelProperty("序号")
     private String id;
@@ -90,5 +91,8 @@ public class TableFieldInfo {
 
     @ExcelProperty("来源字段英文名")
     private String sourceFieldNameEn;
+
+    @ExcelProperty("空白字段")
+    private String blankFieldInfo;
 
 }

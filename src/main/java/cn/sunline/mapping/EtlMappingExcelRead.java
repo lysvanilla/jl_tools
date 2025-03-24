@@ -34,7 +34,7 @@ public class EtlMappingExcelRead {
                 EtlMapp etlMapp = new EtlMapp();
                 Sheet sheet = workbook.getSheetAt(i);
                 String sheetName = sheet.getSheetName();
-                if ("封面".equals(sheetName)||"变更记录".equals(sheetName)||"目录".equals(sheetName)){
+                if ("封面".equals(sheetName)||"变更记录".equals(sheetName)||"目录".equals(sheetName)||"Sheet1".equals(sheetName)){
                     log.debug("跳过工作表:{},文件：{}", sheetName,filePath);
                     continue;
                 }
@@ -44,6 +44,12 @@ public class EtlMappingExcelRead {
                 // 读取EtlGroup相关内容
                 readEtlGroups(sheet, etlMapp);
                 etlMappList.add(etlMapp);
+                String tableNameEn = etlMapp.getTableEnglishName();
+                String tableNameCn = etlMapp.getTableChineseName();
+                int groupsSize = etlMapp.getEtlGroupList().size();
+                if (groupsSize>1){
+                    log.info("表[{}]有[{}]个组，[{}]",tableNameEn,groupsSize,tableNameCn);
+                }
             }
             workbook.close();
             fis.close();
