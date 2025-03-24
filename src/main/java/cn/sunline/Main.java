@@ -79,6 +79,12 @@ public class Main {
             case "gen_table":  //物理模型初稿生成
                 new EtlMappToTable().etlMappToTableMain(argsMap);
                 break;
+            case "std_table":  //标准化物理模型
+                new BatchStandardizedModelExcel().batchUpdateModelExcelMain(argsMap);
+                break;
+            case "std_mapp":  //标准化映射文档
+                new BatchStandardizedMappExcel().batchUpdateMappExcelMain(argsMap);
+                break;
             case "supp_mapp":  //补充映射文档模板
                 new SupplementMappExcel().supplementMappExcelMain(argsMap);
                 break;

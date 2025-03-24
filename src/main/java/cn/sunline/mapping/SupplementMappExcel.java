@@ -73,9 +73,27 @@ public class SupplementMappExcel {
     public static List<EtlMapp> supplementEtlMapp(List<EtlMapp> etlMappList,LinkedHashMap<String, TableStructure> tableMap){
         //List<EtlMapp> etlMappListResult = new ArrayList<>();
         for (EtlMapp etlMapp : etlMappList) {
-            String attributionLevel = StringUtils.defaultString(etlMapp.getAttributionLevel(),"");
+            String attributionLevel = StringUtils.defaultIfBlank(etlMapp.getAttributionLevel(),"");
             List<EtlGroup> etlGroupList = etlMapp.getEtlGroupList();
             for (EtlGroup etlGroup : etlGroupList) {
+                List<EtlGroupJoinInfo> etlGroupJoinInfoList = etlGroup.getEtlGroupJoinInfoList();
+                String mainSrcTableEn = etlGroupJoinInfoList.get(0).getSourceTableEnglishName();
+                String mainSrcTableCn = etlGroupJoinInfoList.get(0).getSourceTableChineseName();
+                for (EtlGroupJoinInfo etlGroupJoinInfo : etlGroupJoinInfoList) {
+                    String sourceTableSchema = etlGroupJoinInfo.getSourceTableSchema();
+                    String sourceTableEnglishName = etlGroupJoinInfo.getSourceTableEnglishName();
+                    String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
+                    if (sourceTableEnglishNameLower.startsWith("c") || sourceTableEnglishNameLower.startsWith("m")){
+                        etlGroupJoinInfo.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
+                        etlGroupJoinInfo.setSourceTableSchema("pdata");
+                    }
+                    if (StringUtils.isNotBlank(sourceTableSchema)){
+                        continue;
+                    } else if (!sourceTableEnglishName.contains("(")) {
+                        etlGroupJoinInfo.setSourceTableSchema("pdata");
+                    }
+                }
+
                 List<EtlGroupColMapp> etlGroupColMappList  = etlGroup.getEtlGroupColMappList();
                 String filterCondition = etlGroup.getFilterCondition();
                 if (StringUtils.isBlank(filterCondition)){
@@ -93,29 +111,52 @@ public class SupplementMappExcel {
                 for (EtlGroupColMapp etlGroupColMapp : etlGroupColMappList) {
                     String targetFieldChineseName = etlGroupColMapp.getTargetFieldChineseName();
                     String sourceTableEnglishName = etlGroupColMapp.getSourceTableEnglishName();
+                    String sourceFieldChineseName = etlGroupColMapp.getSourceFieldChineseName();
+                    String sourceFieldEnglishName = etlGroupColMapp.getSourceFieldEnglishName();
+                    String sourceFieldType = etlGroupColMapp.getSourceFieldType();
                     String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
+                    String mappingRule = etlGroupColMapp.getMappingRule();
+                    String remarks = etlGroupColMapp.getRemarks();
                     TableFieldInfo tableFieldInfo = fieldCnMap.get(targetFieldChineseName);
-                    if (tableFieldInfo == null){
+                    /*if (tableFieldInfo == null){
                         continue;
                     }else{
                         etlGroupColMapp.setTargetFieldEnglishName(tableFieldInfo.getFieldNameEn());
-                    }
+                    }*/
 
                     if (targetFieldChineseName.equals("法人机构编码")||targetFieldChineseName.equals("法人机构编号")){
                         etlGroupColMapp.setTargetFieldEnglishName("LPR_ORG_ID");
                         etlGroupColMapp.setTargetFieldChineseName("法人机构编号");
+                        if (StringUtils.isBlank(mappingRule)){
+                            etlGroupColMapp.setMappingRule("null");
+                            etlGroupColMapp.setRemarks(StringUtils.defaultIfBlank(remarks,"默认值"));
+                        }
                     }else if (targetFieldChineseName.equals("源表名称")){
-                        String mappingRule = etlGroupColMapp.getMappingRule();
                         if (StringUtils.isNotBlank(mappingRule) ){
                             String mappingRuleTmp = mappingRule;
+                            if (mappingRuleTmp.startsWith("''")){
+                                mappingRuleTmp = mappingRuleTmp.substring(1);
+                            }
                             if (!mappingRuleTmp.startsWith("'")){
-                                mappingRuleTmp = "''"+mappingRuleTmp;
+                                mappingRuleTmp = "'"+mappingRuleTmp;
                             }
                             if (!mappingRuleTmp.endsWith("'")){
                                 mappingRuleTmp = mappingRuleTmp+"'";
                             }
                             etlGroupColMapp.setMappingRule(mappingRuleTmp);
+                        }else{
+                            etlGroupColMapp.setMappingRule("'"+mainSrcTableEn+"'");
                         }
+                        etlGroupColMapp.setRemarks(StringUtils.defaultIfBlank(remarks,"默认值"));
+                    }else if (targetFieldChineseName.equals("分区日期")) {
+                        etlGroupColMapp.setMappingRule("PART_DT");
+                        etlGroupColMapp.setSourceTableEnglishName(StringUtils.defaultIfBlank(sourceTableEnglishName,mainSrcTableEn));
+                        etlGroupColMapp.setSourceFieldChineseName(StringUtils.defaultIfBlank(sourceFieldChineseName,mainSrcTableCn));
+                        etlGroupColMapp.setSourceFieldEnglishName(StringUtils.defaultIfBlank(sourceFieldEnglishName,"PART_DT"));
+                        etlGroupColMapp.setSourceFieldType(StringUtils.defaultIfBlank(sourceFieldType,"VARCHAR(10)"));
+                    }else if (targetFieldChineseName.equals("ETL时间")) {
+                        etlGroupColMapp.setMappingRule("SYSTIMESTAMP");
+                        etlGroupColMapp.setRemarks(StringUtils.defaultIfBlank(remarks,"默认值"));
                     }
                     if (sourceTableEnglishNameLower.startsWith("c_") || sourceTableEnglishNameLower.startsWith("m_")){
                         etlGroupColMapp.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
@@ -123,21 +164,7 @@ public class SupplementMappExcel {
 
                 }
 
-                List<EtlGroupJoinInfo> etlGroupJoinInfoList = etlGroup.getEtlGroupJoinInfoList();
-                for (EtlGroupJoinInfo etlGroupJoinInfo : etlGroupJoinInfoList) {
-                    String sourceTableSchema = etlGroupJoinInfo.getSourceTableSchema();
-                    String sourceTableEnglishName = etlGroupJoinInfo.getSourceTableEnglishName();
-                    String sourceTableEnglishNameLower = StringUtils.lowerCase(sourceTableEnglishName);
-                    if (sourceTableEnglishNameLower.startsWith("c") || sourceTableEnglishNameLower.startsWith("m")){
-                        etlGroupJoinInfo.setSourceTableEnglishName("NDWJ_"+sourceTableEnglishName);
-                        etlGroupJoinInfo.setSourceTableSchema("pdata");
-                    }
-                    if (StringUtils.isNotBlank(sourceTableSchema)){
-                        continue;
-                    } else if (!sourceTableEnglishName.contains("(")) {
-                        etlGroupJoinInfo.setSourceTableSchema("pdata");
-                    }
-                }
+
             }
         }
 

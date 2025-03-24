@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static cn.sunline.mapping.EtlMappingExcelRead.readEtlMappExcel;
+import static cn.sunline.mapping.GenTableStructureExcel.writeTableStructureExcel;
 
 /**
  * EtlMappToTable 类用于将 ETL 映射文件转换为表结构信息，并将结果写入 Excel 文件。
@@ -236,7 +237,7 @@ public class EtlMappToTable {
         String outputFilePath = BASIC_EXPORT_PATH + "映射文档转物理模型" + DateUtil.format(DateUtil.date(), "YYYYMMdd_HHmmss") + ".xlsx";
         log.debug("即将生成的 Excel 文件路径为: {}", outputFilePath);
         // 将表字段信息写入 Excel 文件
-        writeTableExcel(tableStructureList,tableFieldInfoListAll, TPL_PATH, outputFilePath);
+        writeTableStructureExcel(tableStructureList,tableFieldInfoListAll, TPL_PATH, outputFilePath);
     }
 
     /**
@@ -245,7 +246,7 @@ public class EtlMappToTable {
      * @param templatePath Excel 模板文件的路径。
      * @param outputPath 输出 Excel 文件的路径。
      */
-    public static void writeTableExcel(List<TableFieldInfo> tableFieldInfoList, String templatePath, String outputPath) {
+    /*public static void writeTableExcel(List<TableFieldInfo> tableFieldInfoList, String templatePath, String outputPath) {
         log.debug("开始检查 Excel 模板文件是否存在。");
         // 创建模板文件和输出文件的 File 对象
         File templateFile = new File(templatePath);
@@ -262,10 +263,10 @@ public class EtlMappToTable {
             excelWriter = FastExcel.write(outputPath).withTemplate(templatePath).build();
             // 创建写入工作表对象，指定工作表名称为 "字段级信息"
             WriteSheet task_sheet = FastExcel.writerSheet("字段级信息").build();
-            log.debug("开始向 Excel 文件写入 {} 条指标信息，输出路径：{}。", tableFieldInfoList.size(), outputPath);
+            log.debug("开始向 Excel 文件写入 {} 条信息，输出路径：{}。", tableFieldInfoList.size(), outputPath);
             // 将表字段信息填充到 Excel 文件中
             excelWriter.fill(tableFieldInfoList, task_sheet);
-            log.info("成功向 Excel 文件写入 {} 条指标信息，输出路径：{}。", tableFieldInfoList.size(), outputPath);
+            log.info("成功向 Excel 文件写入 {} 条信息，输出路径：{}。", tableFieldInfoList.size(), outputPath);
         } catch (Exception e) {
             log.error("写入 Excel 文件时出现异常，输出路径：{}，异常信息：{}", outputPath, e.getMessage());
         } finally {
@@ -319,7 +320,7 @@ public class EtlMappToTable {
             }
         }
         log.debug("转换成功，生成的 Excel 文件路径为：[{}]。", outputPath);
-    }
+    }*/
 
     /**
      * 将字符串按逗号分割为列表，同时处理中文逗号。

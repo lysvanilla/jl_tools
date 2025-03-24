@@ -58,7 +58,7 @@ public class DmlTemplateFiller {
         Map<String, String> argsMap = new HashMap<>();
         //argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\");
         //argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0402.计量模型层\\宝奇订单指标表.xlsx");
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\总账科目余额.xlsx");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\宝奇订单表.xlsx");
         new DmlTemplateFiller().genDmlSqlMain(argsMap);
     }
 
