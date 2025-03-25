@@ -22,7 +22,7 @@ public class BatchStandardizedMappExcel {
     private static List<StandardizedMappingRelation> mappingList = new ArrayList<>();
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
-        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\对公业务申请信息.xlsx");
+        argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\");
         batchUpdateMappExcelMain(argsMap);
     }
 
@@ -60,7 +60,7 @@ public class BatchStandardizedMappExcel {
         List<EtlMapp> etlMappList = readEtlMappExcel(filePath);
         List<EtlMapp> standardizedEtlMappList = getEtlMappExcel(etlMappList);
         genEtlMappExcel(standardizedEtlMappList);
-        System.out.println("1");
+        //System.out.println("1");
     }
 
     public static List<EtlMapp> getEtlMappExcel(List<EtlMapp> etlMappList) {
@@ -89,7 +89,7 @@ public class BatchStandardizedMappExcel {
                         String fieldType = standardizedMappingRelation.getFieldType();
                         etlGroupColMapp.setTargetFieldChineseName(fieldChineseName);
                         etlGroupColMapp.setTargetFieldEnglishName(fieldEnglishName);
-                        etlGroupColMapp.setTargetFieldType(fieldType);
+
                         String changeType = "";
                         if (!targetFieldEnglishName.equals(fieldEnglishName)){
                             changeType = "字段英文名变更";
@@ -97,9 +97,13 @@ public class BatchStandardizedMappExcel {
                         if (!targetFieldChineseName.equals(fieldChineseName)){
                             changeType = changeType+",字段中文名变更";
                         }
-                        if (!targetFieldType.equals(fieldType)){
-                            changeType = changeType+",字段类型变更";
+                        if (StringUtils.isNotBlank(fieldType)){
+                            etlGroupColMapp.setTargetFieldType(fieldType);
+                            if (!targetFieldType.equals(fieldType)){
+                                changeType = changeType+",字段类型变更";
+                            }
                         }
+
                         if (StringUtils.isNotBlank(changeType)){
                             StandardizedMappingRelation standardizedMappingRelation1 = new StandardizedMappingRelation(tableChineseName,tableEnglishName,targetFieldChineseName,targetFieldEnglishName,targetFieldType,fieldChineseName,fieldEnglishName,fieldType,changeType);
                             System.out.println(standardizedMappingRelation1.toString());

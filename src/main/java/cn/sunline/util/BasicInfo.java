@@ -41,6 +41,7 @@ public class BasicInfo {
     // 模板配置文件的设置对象
     public static final Setting TEMPLATE_SETTING = new Setting(GLOBAL_CONFIG_PATH + "template_config.txt");
     public static String dbConfigFile = BASE_PATH+"db.setting";
+    public static String baseModelPath = getBasicPara("base_model_path");
 
     /**
      * 程序入口方法，用于测试获取基础导出路径的功能。

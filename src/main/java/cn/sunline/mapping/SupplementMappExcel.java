@@ -2,6 +2,7 @@ package cn.sunline.mapping;
 
 import cn.hutool.core.io.FileUtil;
 import cn.sunline.table.ExcelTableStructureReader;
+import cn.sunline.util.BasicInfo;
 import cn.sunline.vo.TableFieldInfo;
 import cn.sunline.vo.TableStructure;
 import cn.sunline.vo.etl.EtlGroup;
@@ -22,7 +23,8 @@ public class SupplementMappExcel {
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
         argsMap.put("file_name","D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\");
-        argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层.xlsx");
+        //argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层_v0.2.xlsx");
+        argsMap.put("model_file_name", BasicInfo.baseModelPath);
         supplementMappExcelMain(argsMap);
     }
 
@@ -74,6 +76,8 @@ public class SupplementMappExcel {
         //List<EtlMapp> etlMappListResult = new ArrayList<>();
         for (EtlMapp etlMapp : etlMappList) {
             String attributionLevel = StringUtils.defaultIfBlank(etlMapp.getAttributionLevel(),"");
+            String tableEnglishName = etlMapp.getTableEnglishName();
+            String tableChineseName = etlMapp.getTableChineseName();
             List<EtlGroup> etlGroupList = etlMapp.getEtlGroupList();
             for (EtlGroup etlGroup : etlGroupList) {
                 List<EtlGroupJoinInfo> etlGroupJoinInfoList = etlGroup.getEtlGroupJoinInfoList();
@@ -109,7 +113,17 @@ public class SupplementMappExcel {
                 }
                 LinkedHashMap<String, TableFieldInfo> fieldCnMap = tableStructure.getFieldCnMap();
                 for (EtlGroupColMapp etlGroupColMapp : etlGroupColMappList) {
+                    String targetFieldEnglishName = etlGroupColMapp.getTargetFieldEnglishName();
                     String targetFieldChineseName = etlGroupColMapp.getTargetFieldChineseName();
+                    String targetFieldChineseNameChange = targetFieldChineseName;
+                    targetFieldChineseName = targetFieldChineseName.replaceAll("帐","账").replaceAll("戶","户").replaceAll("稅","税")
+                            .replaceAll("重新订价日","重新定价日");
+                    if (targetFieldChineseName.equals("主键")){
+                        targetFieldChineseName = "主键id";
+                    }
+                    if (!targetFieldChineseName.equals(targetFieldChineseNameChange)){
+                        log.info("字段名称做修改: [{}]-[{}]-[{}]-[{}]",tableChineseName,tableEnglishName,targetFieldChineseNameChange, targetFieldChineseName);
+                    }
                     String sourceTableEnglishName = etlGroupColMapp.getSourceTableEnglishName();
                     String sourceFieldChineseName = etlGroupColMapp.getSourceFieldChineseName();
                     String sourceFieldEnglishName = etlGroupColMapp.getSourceFieldEnglishName();
@@ -118,12 +132,12 @@ public class SupplementMappExcel {
                     String mappingRule = etlGroupColMapp.getMappingRule();
                     String remarks = etlGroupColMapp.getRemarks();
                     TableFieldInfo tableFieldInfo = fieldCnMap.get(targetFieldChineseName);
-                    /*if (tableFieldInfo == null){
-                        continue;
+                    if (tableFieldInfo == null){
+                        log.error("模型文件中不存在字段信息: \t{}\t{}\t{}\t{}\t{}", tableChineseName,tableEnglishName, targetFieldChineseNameChange,targetFieldEnglishName, targetFieldChineseName);
                     }else{
                         etlGroupColMapp.setTargetFieldEnglishName(tableFieldInfo.getFieldNameEn());
-                    }*/
-
+                    }
+                    etlGroupColMapp.setTargetFieldChineseName(targetFieldChineseName);
                     if (targetFieldChineseName.equals("法人机构编码")||targetFieldChineseName.equals("法人机构编号")){
                         etlGroupColMapp.setTargetFieldEnglishName("LPR_ORG_ID");
                         etlGroupColMapp.setTargetFieldChineseName("法人机构编号");

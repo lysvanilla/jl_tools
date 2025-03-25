@@ -46,7 +46,8 @@ public class EtlMappToTable {
         // 创建包含文件路径的参数映射
         Map<String, String> argsMap = new HashMap<>();
         argsMap.put("file_name", "D:\\svn\\jilin\\04.映射设计\\0401.基础模型层\\");
-        argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层.xlsx");
+        //argsMap.put("model_file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层_v0.2.xlsx");
+        argsMap.put("model_file_name",BasicInfo.baseModelPath);
         // 调用主处理方法
         etlMappToTableMain(argsMap);
         log.debug("程序执行完毕，ETL 映射转换任务完成。");

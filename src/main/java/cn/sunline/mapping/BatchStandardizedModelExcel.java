@@ -30,7 +30,8 @@ public class BatchStandardizedModelExcel {
     private static final String BASIC_EXPORT_PATH = BasicInfo.getBasicExportPath("");
     public static void main(String[] args) {
         Map<String, String> argsMap = new HashMap<>();
-        argsMap.put("file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层_v0.2.xlsx");
+        //argsMap.put("file_name","D:\\svn\\jilin\\03.模型设计\\0303.基础模型层\\风险数据集市物理模型-基础层_v0.2.xlsx");
+        argsMap.put("file_name",BasicInfo.baseModelPath);
         batchUpdateModelExcelMain(argsMap);
         System.out.println("finish");
     }
@@ -66,7 +67,7 @@ public class BatchStandardizedModelExcel {
             List<TableFieldInfo> tableFieldInfoList = value.getFields();
             if (tableFieldInfoList == null){
                 tableFieldInfoList = new ArrayList<>();
-                log.error("[{}]-[{}]在字段级信息中未泪痣",key,value.getTableNameCn());
+                log.error("[{}]-[{}]在字段级信息中未存在",key,value.getTableNameCn());
             }
             for (TableFieldInfo tableFieldInfo : tableFieldInfoList) {
                 String tableNameEn = tableFieldInfo.getTableNameEn();
@@ -81,7 +82,8 @@ public class BatchStandardizedModelExcel {
                     String fieldTypeStd = standardizedMappingRelation.getFieldType();
                     tableFieldInfo.setFieldNameCn(fieldChineseNameStd);
                     tableFieldInfo.setFieldNameEn(fieldEnglishNameStd);
-                    tableFieldInfo.setFieldType(fieldTypeStd);
+
+
                     String changeType = "";
                     if (!fieldEnglishNameStd.equals(fieldNameEn)){
                         changeType = "字段英文名变更";
@@ -89,9 +91,13 @@ public class BatchStandardizedModelExcel {
                     if (!fieldChineseNameStd.equals(fieldNameCn)){
                         changeType = changeType+",字段中文名变更";
                     }
-                    if (!fieldTypeStd.equals(fieldType)){
-                        changeType = changeType+",字段类型变更";
+                    if (StringUtils.isNotBlank(fieldTypeStd)){
+                        tableFieldInfo.setFieldType(fieldTypeStd);
+                        if (!fieldTypeStd.equals(fieldType)){
+                            changeType = changeType+",字段类型变更";
+                        }
                     }
+
                     if (StringUtils.isNotBlank(changeType)){
                         StandardizedMappingRelation standardizedMappingRelation1 = new StandardizedMappingRelation(tableNameCn,tableNameEn,fieldNameCn,fieldNameEn,fieldType,fieldChineseNameStd,fieldEnglishNameStd,fieldTypeStd,changeType);
                         //System.out.println(standardizedMappingRelation1.toString());
