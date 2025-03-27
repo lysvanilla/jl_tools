@@ -80,21 +80,24 @@ public class BatchStandardizedModelExcel {
                     String fieldChineseNameStd = standardizedMappingRelation.getFieldChineseName();
                     String fieldEnglishNameStd = standardizedMappingRelation.getFieldEnglishName();
                     String fieldTypeStd = standardizedMappingRelation.getFieldType();
-                    tableFieldInfo.setFieldNameCn(fieldChineseNameStd);
-                    tableFieldInfo.setFieldNameEn(fieldEnglishNameStd);
-
 
                     String changeType = "";
-                    if (!fieldEnglishNameStd.equals(fieldNameEn)){
-                        changeType = "字段英文名变更";
+                    if (StringUtils.isNotBlank(fieldNameEn)) {
+                        if (!fieldEnglishNameStd.equals(fieldNameEn)) {
+                            changeType = "字段英文名变更";
+                            tableFieldInfo.setFieldNameEn(fieldEnglishNameStd);
+                        }
                     }
-                    if (!fieldChineseNameStd.equals(fieldNameCn)){
-                        changeType = changeType+",字段中文名变更";
+                    if (StringUtils.isNotBlank(fieldNameCn)) {
+                        if (!fieldChineseNameStd.equals(fieldNameCn)) {
+                            changeType = changeType + ",字段中文名变更";
+                            tableFieldInfo.setFieldNameCn(fieldChineseNameStd);
+                        }
                     }
                     if (StringUtils.isNotBlank(fieldTypeStd)){
-                        tableFieldInfo.setFieldType(fieldTypeStd);
                         if (!fieldTypeStd.equals(fieldType)){
                             changeType = changeType+",字段类型变更";
+                            tableFieldInfo.setFieldType(fieldTypeStd);
                         }
                     }
 

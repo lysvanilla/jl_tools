@@ -87,20 +87,24 @@ public class BatchStandardizedMappExcel {
                         String fieldChineseName = standardizedMappingRelation.getFieldChineseName();
                         String fieldEnglishName = standardizedMappingRelation.getFieldEnglishName();
                         String fieldType = standardizedMappingRelation.getFieldType();
-                        etlGroupColMapp.setTargetFieldChineseName(fieldChineseName);
-                        etlGroupColMapp.setTargetFieldEnglishName(fieldEnglishName);
 
                         String changeType = "";
-                        if (!targetFieldEnglishName.equals(fieldEnglishName)){
-                            changeType = "字段英文名变更";
+                        if (StringUtils.isNotBlank(fieldEnglishName)) {
+                            if (!targetFieldEnglishName.equals(fieldEnglishName)) {
+                                changeType = "字段英文名变更";
+                                etlGroupColMapp.setTargetFieldEnglishName(fieldEnglishName);
+                            }
                         }
-                        if (!targetFieldChineseName.equals(fieldChineseName)){
-                            changeType = changeType+",字段中文名变更";
+                        if (StringUtils.isNotBlank(fieldChineseName)) {
+                            if (!targetFieldChineseName.equals(fieldChineseName)) {
+                                changeType = changeType + ",字段中文名变更";
+                                etlGroupColMapp.setTargetFieldChineseName(fieldChineseName);
+                            }
                         }
                         if (StringUtils.isNotBlank(fieldType)){
-                            etlGroupColMapp.setTargetFieldType(fieldType);
                             if (!targetFieldType.equals(fieldType)){
                                 changeType = changeType+",字段类型变更";
+                                etlGroupColMapp.setTargetFieldType(fieldType);
                             }
                         }
 

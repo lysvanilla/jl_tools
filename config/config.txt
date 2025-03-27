@@ -2,4 +2,4 @@
 out_base_path=D:\吉林银行
 
 # 基础模型层物理模型路径
-base_model_path=D:\svn\jilin\03.模型设计\0303.基础模型层\风险数据集市物理模型-基础层_v0.2.xlsx
+base_model_path=D:\svn\jilin\03.模型设计\0303.基础模型层\风险数据集市物理模型-基础层_v0.5.xlsx

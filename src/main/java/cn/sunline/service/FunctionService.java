@@ -14,12 +14,10 @@ import java.util.*;
  */
 @Slf4j
 public class FunctionService {
-    public static final Map<String, Function> FUNCTION_MAP;
+    public static final LinkedHashMap<String, Function> FUNCTION_MAP;
     
     static {
-        LinkedHashMap<String, Function> functionMap = DefaultFunctionData.getDefaultFunctions();
-
-        FUNCTION_MAP = Collections.unmodifiableMap(functionMap);
+        FUNCTION_MAP = DefaultFunctionData.getDefaultFunctions();
     }
 
     /**

@@ -66,6 +66,8 @@ public class DefaultFunctionData {
         functionMap.put(zbFunction.getFunctionNameCn(), zbFunction);
         functionMap.put(cfFunction.getFunctionNameCn(), cfFunction);
         functionMap.put(hbFunction.getFunctionNameCn(), hbFunction);
+        functionMap.put(genStdTableFunction.getFunctionNameCn(), genStdTableFunction);
+        functionMap.put(genStdMappFunction.getFunctionNameCn(), genStdMappFunction);
 
         
         return functionMap;

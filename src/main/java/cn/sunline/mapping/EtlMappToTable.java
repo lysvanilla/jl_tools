@@ -122,11 +122,15 @@ public class EtlMappToTable {
         log.debug("开始从文件 {} 中读取 ETL 映射信息。", filePath);
         // 从文件中读取 ETL 映射信息
         List<EtlMapp> etlMappList = readEtlMappExcel(filePath);
+        String fileName = FileUtil.mainName(filePath);
         log.info("从文件 {} 中读取到 {} 条 ETL 映射信息。", filePath, etlMappList.size());
         List<TableStructure> tableStructureList = new ArrayList<>();
         // 遍历 ETL 映射信息，创建表结构信息
         for (EtlMapp etlMapp : etlMappList) {
             String tableEnglishName = etlMapp.getTableEnglishName();
+            /*if (tableEnglishName.equals("F_MKT_BILL_TRAN_SELL")){
+                log.info("filePath路径-{}",filePath);
+            }*/
             String tableChineseName = etlMapp.getTableChineseName();
             String analyst = etlMapp.getAnalyst();
             String primaryKeyField = etlMapp.getPrimaryKeyField();
@@ -158,7 +162,7 @@ public class EtlMappToTable {
                 if (etlGroupSize>1){
                     for (EtlGroup etlGroup1 :etlGroupList){
                         String templateType = etlGroup1.getTemplateType();
-                        if(templateType.equals("N1")){
+                        if(templateType.equals("N2")){
                             etlGroup = etlGroup1;
                             break;
                         }
@@ -166,6 +170,10 @@ public class EtlMappToTable {
                 }
 
                 String distributionKey = etlGroup.getDistributionKey();
+                String targetTableEnglishNameGroup = etlGroup.getTargetTableEnglishName();
+                if (!targetTableEnglishNameGroup.equals(tableEnglishName)){
+                    log.error("表英文名与ETL组英文名不一致: [{}]-[{}]-[{}]-[{}]",fileName, tableChineseName,tableEnglishName,targetTableEnglishNameGroup);
+                }
                 // 将分布键字段字符串按逗号分割为列表
                 List<String> distributionKeyList = splitStringByComma(distributionKey);
                 List<EtlGroupColMapp> etlGroupColMappList = etlGroup.getEtlGroupColMappList();
