@@ -39,7 +39,8 @@ public class DdlTemplateFiller {
         filePath = "D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx";
         // 调用 genDdlSql 方法生成 DDL SQL 语句
         //genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-计量层.xlsx");
-        genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-接口层.xlsx");
+        //genDdlSql("D:\\svn\\jilin\\03.模型设计\\0302.智能风控系统\\风险数据集市物理模型-接口层.xlsx");
+        genDdlSql("D:\\BaiduSyncdisk\\工作目录\\商机\\202503湖南银行指标管理平台\\业务表表结构.xlsx");
     }
 
     /**
@@ -179,6 +180,17 @@ public class DdlTemplateFiller {
                 .replace("${table_name_cn}", tableNameCn).replace("${table_schema}", tableSchema).replace("${mapping_analyst}", designer)
                 .replace("${create_time}", onlineTime).replace("${src_table_name_en_lower}", sourceTableNameEnLower);
 
+        // 存储主键的列表
+        List<String> primaryKeys = new ArrayList<>();
+        // 遍历表的字段信息，找出主键
+        for (TableFieldInfo field : tableStructure.getFields()) {
+            if ("Y".equals(field.getPrimaryKey())) {
+                primaryKeys.add(field.getFieldNameEn());
+            }
+        }
+        // 将主键列表拼接成字符串
+        String primaryKeyStr = String.join(",", primaryKeys);
+
         // 存储分桶键的列表
         List<String> bucketKeys = new ArrayList<>();
         // 遍历表的字段信息，找出分桶键
@@ -197,6 +209,7 @@ public class DdlTemplateFiller {
         }
         // 替换模板中的分桶键
         exportSql = exportSql.replace("${bucketKey}", bucketKeyStr);
+        exportSql = exportSql.replace("${primaryKey}", primaryKeyStr);
 
         // 遍历模板中的循环行信息
         for (String circleLineTpl : circleLineList) {
