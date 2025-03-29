@@ -1,8 +1,8 @@
-package com.example.resume;
+package cn.resume;
 
-import com.example.resume.entity.ProjectExperience;
-import com.example.resume.entity.Resume;
-import com.example.resume.entity.WorkExperience;
+import cn.resume.entity.ProjectExperience;
+import cn.resume.entity.Resume;
+import cn.resume.entity.WorkExperience;
 
 public class TableResumeParserDemo {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package com.example.resume.entity;
+package cn.resume.entity;
 
 import lombok.Data;
 import java.util.List;

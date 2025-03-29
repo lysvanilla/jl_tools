@@ -1,23 +1,16 @@
-package com.example.resume.policy;
+package cn.resume.policy;
 
-import com.deepoove.poi.data.RowRenderData;
-import com.deepoove.poi.data.Rows;
-import com.deepoove.poi.data.Texts;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
-import com.deepoove.poi.template.ElementTemplate;
-import com.deepoove.poi.XWPFTemplate;
-import com.example.resume.entity.ProjectExperience;
-import com.example.resume.entity.Resume;
+import cn.resume.entity.ProjectExperience;
+import cn.resume.entity.Resume;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTVMerge;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

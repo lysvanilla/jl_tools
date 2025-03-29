@@ -1,9 +1,9 @@
-package com.example.resume;
+package cn.resume;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
-import com.example.resume.entity.Resume;
-import com.example.resume.policy.ProjectExperienceTablePolicy;
+import cn.resume.entity.Resume;
+import cn.resume.policy.ProjectExperienceTablePolicy;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class ResumeWordExporter {
     public static void main(String[] args) {
         // 测试导出功能
         String inputFilePath = "D:\\projects\\jl_tools\\logs\\00603+邹智+工作简历.docx";
-        String templatePath = "D:\\projects\\jl_tools\\template\\doc\\简历模版1.docx";
+        String templatePath = "D:\\projects\\jl_tools\\template\\doc\\简历模版.docx";
         String outputPath = "D:\\projects\\jl_tools\\logs\\导出简历_" + System.currentTimeMillis() + ".docx";
         
         System.out.println("开始解析简历文件: " + inputFilePath);

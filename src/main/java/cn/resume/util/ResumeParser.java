@@ -1,8 +1,8 @@
-package com.example.resume.util;
+package cn.resume.util;
 
-import com.example.resume.entity.Resume;
-import com.example.resume.entity.WorkExperience;
-import com.example.resume.entity.ProjectExperience;
+import cn.resume.entity.Resume;
+import cn.resume.entity.WorkExperience;
+import cn.resume.entity.ProjectExperience;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.Range;

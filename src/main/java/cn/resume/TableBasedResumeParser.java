@@ -1,16 +1,14 @@
-package com.example.resume;
+package cn.resume;
 
-import com.example.resume.entity.ProjectExperience;
-import com.example.resume.entity.Resume;
-import com.example.resume.entity.WorkExperience;
+import cn.resume.entity.ProjectExperience;
+import cn.resume.entity.Resume;
+import cn.resume.entity.WorkExperience;
 import org.apache.poi.xwpf.usermodel.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TableBasedResumeParser {
     
