@@ -4,35 +4,77 @@ import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import cn.resume.entity.Resume;
 import cn.resume.policy.ProjectExperienceTablePolicy;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 简历导出器 - 使用poi-tl将解析的Resume对象按模板导出为Word文档
  */
+@Slf4j
 public class ResumeWordExporter {
 
     public static void main(String[] args) {
         // 测试导出功能
         String inputFilePath = "D:\\projects\\jl_tools\\logs\\00603+邹智+工作简历.docx";
-        String templatePath = "D:\\projects\\jl_tools\\template\\doc\\简历模版.docx";
-        String outputPath = "D:\\projects\\jl_tools\\logs\\导出简历_" + System.currentTimeMillis() + ".docx";
-        
-        System.out.println("开始解析简历文件: " + inputFilePath);
-        Resume resume = TableBasedResumeParser.parseResume(inputFilePath);
-        
-        if (resume != null) {
-            System.out.println("开始导出简历到Word文档");
-            exportResumeToWord(resume, templatePath, outputPath);
-            System.out.println("简历已成功导出到: " + outputPath);
-        } else {
-            System.out.println("简历解析失败，无法导出");
+
+        //XWPFTemplate template = exportResumeToWord(inputFilePath);
+        BatchExportResumeToWord("D:\\BaiduSyncdisk\\工作目录\\管理2025\\金融业务十部简历\\金融业务十部\\金融业务10A部");
+    }
+
+    public static void BatchExportResumeToWord(String inputDirectory){
+        BatchExportResumeToWord(inputDirectory,".docx", ".doc");
+    }
+    public static void BatchExportResumeToWord(String inputDirectory,String... fileExtensions){
+        File directory = new File(inputDirectory);
+        if (!directory.exists() || !directory.isDirectory()) {
+            log.error("输入目录不存在或不是目录: {}", inputDirectory);
+        }
+
+        // 获取所有指定扩展名的文件
+        File[] files = directory.listFiles((dir, name) -> {
+            String lowerName = name.toLowerCase();
+            return Arrays.stream(fileExtensions)
+                    .map(String::toLowerCase)
+                    .anyMatch(lowerName::endsWith);
+        });
+
+        if (files == null || files.length == 0) {
+            log.error("目录中没有找到指定扩展名的文件");
+        }
+
+        // 按文件名排序
+        List<File> fileList = new ArrayList<>(Arrays.asList(files));
+        fileList.sort(File::compareTo);
+
+        for (File file : fileList) {
+            exportResumeToWord(file.getAbsolutePath());
         }
     }
-    
+
+    public static XWPFTemplate exportResumeToWord(String inputFilePath){
+        String templatePath = "D:\\projects\\jl_tools\\template\\doc\\简历模版.docx";
+        System.out.println("开始解析简历文件: " + inputFilePath);
+        Resume resume = TableBasedResumeParser.parseResume(inputFilePath);
+        String outputPath = "D:\\projects\\jl_tools\\logs\\output\\简历_"+resume.getName()+"_" + System.currentTimeMillis() + ".docx";
+        if (resume != null) {
+            System.out.println("开始导出简历到Word文档");
+            XWPFTemplate template = exportResumeToWord(resume, templatePath, outputPath);
+            System.out.println("简历已成功导出到: " + outputPath);
+            return template;
+        } else {
+            System.out.println("简历解析失败，无法导出");
+            return null;
+        }
+    }
+
     /**
      * 将Resume对象导出到Word模板
      * 
@@ -40,7 +82,8 @@ public class ResumeWordExporter {
      * @param templatePath 模板文件路径
      * @param outputPath 输出文件路径
      */
-    public static void exportResumeToWord(Resume resume, String templatePath, String outputPath) {
+    public static XWPFTemplate exportResumeToWord(Resume resume, String templatePath, String outputPath) {
+        XWPFTemplate template = null;
         try {
             // 准备数据
             Map<String, Object> data = prepareDataForTemplate(resume);
@@ -56,7 +99,7 @@ public class ResumeWordExporter {
             // 直接将resume对象设置为projectExperiences标记的值
             data.put("projectExperiences", resume);
             
-            XWPFTemplate template = XWPFTemplate.compile(templatePath, config)
+            template = XWPFTemplate.compile(templatePath, config)
                     .render(data);
             
             // 写入文件
@@ -68,6 +111,7 @@ public class ResumeWordExporter {
             e.printStackTrace();
             System.out.println("导出简历时发生错误: " + e.getMessage());
         }
+        return template;
     }
     
     /**
