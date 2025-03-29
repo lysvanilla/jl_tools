@@ -43,7 +43,7 @@ public class ResumeDemoCreator {
         titleRun.setFontSize(16);
         
         // 添加基本信息表格
-        XWPFTable infoTable = document.createTable(4, 4);
+        XWPFTable infoTable = document.createTable(5, 4);
         setTableWidth(infoTable, 9000);
         
         // 设置基本信息表格内容
@@ -64,8 +64,13 @@ public class ResumeDemoCreator {
         
         setCellText(infoTable, 3, 0, "工作年限");
         setCellText(infoTable, 3, 1, "{{workYears}}");
-        setCellText(infoTable, 3, 2, "");
-        setCellText(infoTable, 3, 3, "");
+        setCellText(infoTable, 3, 2, "毕业学校");
+        setCellText(infoTable, 3, 3, "{{school}}");
+        
+        setCellText(infoTable, 4, 0, "专业");
+        setCellText(infoTable, 4, 1, "{{major}}");
+        setCellText(infoTable, 4, 2, "毕业时间");
+        setCellText(infoTable, 4, 3, "{{graduationDate}}");
         
         // 添加空行
         document.createParagraph();

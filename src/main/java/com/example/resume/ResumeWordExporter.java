@@ -86,8 +86,9 @@ public class ResumeWordExporter {
         data.put("major", getValueOrDefault(resume.getMajor(), ""));
         data.put("graduationDate", getValueOrDefault(resume.getGraduationDate(), ""));
         data.put("certification", getValueOrDefault(resume.getCertification(), ""));
+        data.put("school", getValueOrDefault(resume.getSchool(), ""));
         
-        // 2. 计算本单位任职时间（如果有工作经历）
+        // 2. 计算本单位任职时间（查找包含"长亮"的公司名称的工作经历中最早的开始时间）
         String employmentPeriod = calculateEmploymentPeriod(resume);
         data.put("employmentPeriod", employmentPeriod);
         
@@ -106,14 +107,35 @@ public class ResumeWordExporter {
     }
     
     /**
-     * 计算本单位任职时间
+     * 计算本单位任职时间（查找包含"长亮"的公司名称的工作经历中最早的开始时间）
      */
     private static String calculateEmploymentPeriod(Resume resume) {
         if (resume.getWorkExperiences() != null && !resume.getWorkExperiences().isEmpty()) {
-            // 获取第一条工作经历（假设是当前工作）
+            String earliestDate = null;
+            
+            // 遍历工作经历，查找包含"长亮"的公司名称
+            for (int i = 0; i < resume.getWorkExperiences().size(); i++) {
+                String company = resume.getWorkExperiences().get(i).getCompany();
+                if (company != null && company.contains("长亮")) {
+                    String startDate = resume.getWorkExperiences().get(i).getStartDate();
+                    if (startDate != null && !startDate.isEmpty()) {
+                        // 如果是第一个找到的日期，或者比当前最早的日期更早，则更新
+                        if (earliestDate == null || startDate.compareTo(earliestDate) < 0) {
+                            earliestDate = startDate;
+                        }
+                    }
+                }
+            }
+            
+            // 如果找到了包含"长亮"的公司的最早开始时间，则返回
+            if (earliestDate != null) {
+                return earliestDate ;
+            }
+            
+            // 如果没有找到包含"长亮"的公司，则返回第一条工作经历
             String startDate = resume.getWorkExperiences().get(0).getStartDate();
             if (startDate != null && !startDate.isEmpty()) {
-                return startDate + "至今";
+                return startDate ;
             }
         }
         return "";
