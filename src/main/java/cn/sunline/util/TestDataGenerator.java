@@ -228,9 +228,10 @@ public class TestDataGenerator {
 
             if (fieldNameEn.contains("DATA_DATE")) {
                 // DATA_DATE字段使用固定值
-                dateValue = "'20241231'";
+                //dateValue = "'20241231'";
+                dateValue = "'20250102'";
                 log.debug("生成DATA_DATE固定日期: {} for {}", dateValue, fieldNameCn);
-            } else if ((fieldNameEn.contains("OPEN_DATE") || fieldNameCn.contains("开户日期")) || 
+            } else if ((fieldNameEn.contains("OPEN_DATE") || fieldNameCn.contains("开户日期")) ||
                 (fieldNameEn.contains("EFF_DATE") || fieldNameCn.contains("生效日期"))) {
                 // 开户日期和生效日期相同且最早
                 dateValue = formatDateValue(openDate);
@@ -260,34 +261,21 @@ public class TestDataGenerator {
     }
 
     /**
-     * 根据字段类型生成模拟数据
+     * 根据字段类型生成对应的值
      */
     private static String generateFieldValue(TableFieldInfo field) {
         String fieldType = field.getFieldType().toUpperCase();
-        String fieldName = field.getFieldNameEn().toUpperCase();
-        String fieldNameCn = field.getFieldNameCn().toUpperCase();
-
-        // 处理主键字段
-        if ("Y".equals(field.getPrimaryKey())) {
-            return String.format("'PK_%s'", RandomUtil.randomString(8));
+        
+        // 处理数值类型
+        if (fieldType.startsWith("INT") || 
+            fieldType.startsWith("NUMERIC") || 
+            fieldType.startsWith("NUMBER") || 
+            fieldType.startsWith("DECIMAL")) {
+            return generateNumberValue(field);
         }
         
-        // 根据字段类型生成对应的模拟数据
-        if (fieldName.contains("DATA_DATE")) {
-            return "2024-12-31";
-        } else if (fieldType.contains("VARCHAR") || fieldType.contains("CHAR")) {
-            return String.format("'%s'", generateStringValue(field));
-        } else if (fieldType.contains("NUMBER") || fieldType.contains("DECIMAL")|| fieldType.contains("NUMERIC")) {
-            return generateNumberValue(field);
-        } else if (fieldType.contains("INT")) {
-            return generateNumberValue(field);
-        } else if (fieldType.contains("DATE") || fieldType.contains("TIMESTAMP")) {
-            return generateDateValue();
-        } else if (fieldType.contains("BOOLEAN")) {
-            return RandomUtil.randomBoolean() ? "1" : "0";
-        } else {
-            return "NULL";
-        }
+        // 处理字符串类型
+        return "'" + generateStringValue(field) + "'";
     }
 
     /**
@@ -315,14 +303,18 @@ public class TestDataGenerator {
         // 特殊字段处理
         if (fieldName.contains("SUBJ_DIRCT_CD") || 
             (fieldNameCn != null && fieldNameCn.contains("科目方向代码"))) {
-            // 科目方向代码返回C(贷)或D(借)
             return RandomUtil.randomBoolean() ? "C" : "D";
-        } if (fieldName.contains("CURR_CD") ||
+        } else if (fieldName.contains("IS_NO_VIR_ACCT")) {
+            // DATA_DATE字段使用固定值
+            //dateValue = "'20241231'";
+            return RandomUtil.randomBoolean() ? "Y" : "N";
+        } else if (fieldName.contains("CURR_CD") ||
                 (fieldNameCn != null && fieldNameCn.contains("币种代码"))) {
-            // 科目方向代码返回C(贷)或D(借)
             return RandomUtil.randomBoolean() ? "CNY" : "USD";
         } else if (fieldNameCn != null && fieldNameCn.contains("标志")) {
             return RandomUtil.randomBoolean() ? "Y" : "N";
+        } else if (fieldName.contains("PROD_CD")) {
+            return String.format("%03d", RandomUtil.randomInt(0, 999));
         } else if (fieldName.contains("SUBJ_NO")) {
             return String.format("%04d", RandomUtil.randomInt(0, 10000));
         } else if (fieldName.contains("CUST_TYPE_CD")) {
@@ -388,6 +380,12 @@ public class TestDataGenerator {
         String fieldName = field.getFieldNameEn().toUpperCase();
         String fieldType = field.getFieldType().toUpperCase();
         
+        // 特殊处理账户编号
+        if (fieldName.equals("ACCT_NO")) {
+            // 生成8位数字的账户编号
+            return String.valueOf(RandomUtil.randomInt(10000000, 99999999));
+        }
+        
         // 解析精度信息
         int[] precision = parseNumberPrecision(fieldType);
         int totalLength = precision[0];  // 总长度
@@ -397,20 +395,27 @@ public class TestDataGenerator {
         // 计算整数部分的最大值
         long maxInteger = (long)Math.pow(10, integerPlaces) - 1;
         
+        if (fieldType.startsWith("INT")) {
+            // 整数类型特殊处理
+            if (fieldType.equals("INT4") || fieldType.equals("INTEGER")) {
+                return String.valueOf(RandomUtil.randomInt(0, Integer.MAX_VALUE));
+            } else if (fieldType.equals("INT8") || fieldType.equals("BIGINT")) {
+                return String.valueOf(RandomUtil.randomLong(0, Long.MAX_VALUE));
+            } else if (fieldType.equals("INT2") || fieldType.equals("SMALLINT")) {
+                return String.valueOf(RandomUtil.randomInt(0, Short.MAX_VALUE));
+            }
+        }
+        
         double value;
         if (fieldName.contains("AMOUNT") || fieldName.contains("MONEY")) {
-            // 金额类型，生成两位小数
             value = RandomUtil.randomDouble(0, maxInteger);
             return formatNumber(value, Math.min(decimalPlaces, 2));
         } else if (fieldName.contains("RATE") || fieldName.contains("PERCENT")) {
-            // 比率类型，生成0-100之间的数
             value = RandomUtil.randomDouble(0, Math.min(100, maxInteger));
             return formatNumber(value, Math.min(decimalPlaces, 4));
         } else if (fieldName.contains("AGE")) {
-            // 年龄类型，生成0-100之间的整数
             return String.valueOf(RandomUtil.randomInt(0, Math.min(100, (int)maxInteger)));
         } else if (fieldName.contains("COUNT") || fieldName.contains("NUM")) {
-            // 计数类型，生成0-1000之间的整数
             return String.valueOf(RandomUtil.randomInt(0, Math.min(1000, (int)maxInteger)));
         }
         
@@ -419,7 +424,6 @@ public class TestDataGenerator {
             value = RandomUtil.randomDouble(0, maxInteger);
             return formatNumber(value, decimalPlaces);
         } else {
-            // 整数类型
             return String.valueOf(RandomUtil.randomInt(0, (int)maxInteger));
         }
     }
@@ -463,17 +467,6 @@ public class TestDataGenerator {
     }
 
     /**
-     * 生成日期类型的模拟数据
-     */
-    private static String generateDateValue() {
-        // 生成最近一年内的随机日期
-        Date now = new Date();
-        // 使用正确的randomDate方法，指定开始时间、时间字段、最小值和最大值
-        Date randomDate = RandomUtil.randomDate(now, DateField.MONTH, -12, 0);
-        return String.format("'%s'", DateUtil.format(randomDate, "yyyy-MM-dd HH:mm:ss"));
-    }
-
-    /**
      * 主方法，用于测试数据生成
      */
     public static void main(String[] args) {
@@ -481,7 +474,7 @@ public class TestDataGenerator {
         String modelFilePath = "D:\\BaiduSyncdisk\\工作目录\\商机\\202503湖南银行指标管理平台\\业务表表结构.xlsx";
         try {
             LinkedHashMap<String, TableStructure> tableMap = ExcelTableStructureReader.readExcel(modelFilePath);
-            List<String> insertStatements = generateInsertStatements(tableMap, 10);
+            List<String> insertStatements = generateInsertStatements(tableMap, 30);
             
             // 打印生成的INSERT语句
             insertStatements.forEach(System.out::println);
@@ -498,7 +491,7 @@ public class TestDataGenerator {
      * 将INSERT语句写入文件
      */
     private static void writeToFile(List<String> sqlStatements) {
-        String outputPath = "test_data_" + DateUtil.format(new Date(), "yyyyMMdd_HHmmss") + ".sql";
+        String outputPath = base_export_path+"test_data_" + DateUtil.format(new Date(), "yyyyMMdd_HHmmss") + ".sql";
         try {
             // 在文件开头添加注释
             List<String> statementsWithHeader = new ArrayList<>();
