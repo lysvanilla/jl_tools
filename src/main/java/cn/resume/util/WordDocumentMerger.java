@@ -1,5 +1,7 @@
 package cn.resume.util;
 
+import cn.sunline.util.BasicInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +16,9 @@ import java.util.List;
 /**
  * Word文档合并工具类 - 用于合并多个Word文档到一个文档中
  */
+@Slf4j
 public class WordDocumentMerger {
-    private static final Logger logger = LoggerFactory.getLogger(WordDocumentMerger.class);
+    private static final String BASIC_EXPORT_PATH = BasicInfo.getBasicExportPath("");
 
     /**
      * 合并指定目录下的所有Word文档
@@ -28,7 +31,7 @@ public class WordDocumentMerger {
     public static boolean mergeDirectory(String inputDirectory, String outputPath, String... fileExtensions) {
         File directory = new File(inputDirectory);
         if (!directory.exists() || !directory.isDirectory()) {
-            logger.error("输入目录不存在或不是目录: {}", inputDirectory);
+            log.error("输入目录不存在或不是目录: {}", inputDirectory);
             return false;
         }
 
@@ -41,7 +44,7 @@ public class WordDocumentMerger {
         });
 
         if (files == null || files.length == 0) {
-            logger.error("目录中没有找到指定扩展名的文件");
+            log.error("目录中没有找到指定扩展名的文件");
             return false;
         }
 
@@ -65,7 +68,7 @@ public class WordDocumentMerger {
             for (int i = 0; i < files.size(); i++) {
                 File file = files.get(i);
                 try {
-                    logger.info("正在处理文件: {}", file.getName());
+                    log.info("正在处理文件: {}", file.getName());
                     
                     // 如果不是第一个文档，添加分页符
                     if (i > 0) {
@@ -80,7 +83,7 @@ public class WordDocumentMerger {
                         mergeDoc(mergedDoc, file);
                     }
                 } catch (Exception e) {
-                    logger.error("处理文件失败: " + file.getName(), e);
+                    log.error("处理文件失败: " + file.getName(), e);
                 }
             }
 
@@ -88,10 +91,10 @@ public class WordDocumentMerger {
             try (FileOutputStream out = new FileOutputStream(outputPath)) {
                 mergedDoc.write(out);
             }
-            logger.info("成功合并文档到: {}", outputPath);
+            log.info("成功合并文档到: {}", outputPath);
             return true;
         } catch (IOException e) {
-            logger.error("合并文档失败", e);
+            log.error("合并文档失败", e);
             return false;
         }
     }
@@ -122,13 +125,13 @@ public class WordDocumentMerger {
     private static void mergeDoc(XWPFDocument mergedDoc, File file) throws IOException {
         // TODO: 实现.doc文件的合并
         // 注意：.doc文件需要使用HWPFDocument类来处理
-        logger.warn("暂不支持合并.doc文件: {}", file.getName());
+        log.warn("暂不支持合并.doc文件: {}", file.getName());
     }
 
     public static void main(String[] args) {
         // 测试用例
-        String inputDir = "D:\\projects\\jl_tools\\logs\\output";
-        String outputPath = "D:\\projects\\jl_tools\\logs\\merged_documents_" + System.currentTimeMillis() + ".docx";
+        String inputDir = "D:\\吉林银行\\risk_20250331\\resume_export";
+        String outputPath = BASIC_EXPORT_PATH+"merged_documents_" + System.currentTimeMillis() + ".docx";
         
         // 合并.docx和.doc文件
         boolean success = mergeDirectory(inputDir, outputPath, ".docx", ".doc");

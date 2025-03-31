@@ -18,7 +18,9 @@ public class Resume {
     private String certification;   // 资质认证
     private String training;        // 参与培训
     private String skillTags;       // 技能标签
-    
+    private String workExperiencesStr;
+    private String projectExperiencesStr;
+
     private List<WorkExperience> workExperiences;    // 工作经历
     private List<ProjectExperience> projectExperiences;  // 项目经历
 

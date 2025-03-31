@@ -10,6 +10,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STVerticalJc;
 
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,7 @@ public class ProjectExperienceTablePolicy extends DynamicTableRenderPolicy {
         }
         
         // 计算需要显示的项目经验数量（最多10条）
-        int displayCount = Math.min(projectExperiences.size(), 10);
+        int displayCount = Math.min(projectExperiences.size(), 50);
         
         // Step 1: 先复制模板行，创建足够数量的行
         for (int i = 1; i < displayCount; i++) {
@@ -145,6 +146,7 @@ public class ProjectExperienceTablePolicy extends DynamicTableRenderPolicy {
             String projectName = getValueOrDefault(exp.getProjectName(), "");
             String startDate = getValueOrDefault(exp.getStartDate(), "");
             String endDate = getValueOrDefault(exp.getEndDate(), "");
+            String description = getValueOrDefault(exp.getDescription(), "");
             String projectDesc = projectName + " (" + startDate + " - " + endDate + ")";
             
             // 项目角色
@@ -156,10 +158,97 @@ public class ProjectExperienceTablePolicy extends DynamicTableRenderPolicy {
             mergeCellsHorizontally(table, rowIndex, 0, 4);
             
             // 2. 在合并后的单元格中写入项目名称和时间
-            row.getCell(0).setText(projectDesc);
+            XWPFTableCell nameCell = row.getCell(0);
+            // 清空单元格中的现有内容
+            for (XWPFParagraph p : nameCell.getParagraphs()) {
+                for (XWPFRun run : p.getRuns()) {
+                    run.setText("", 0);
+                }
+            }
+            
+            // 获取或创建第一个段落
+            XWPFParagraph paragraph;
+            if (nameCell.getParagraphs().isEmpty()) {
+                paragraph = nameCell.addParagraph();
+            } else {
+                paragraph = nameCell.getParagraphs().get(0);
+            }
+            
+            // 设置段落属性（如果需要）
+            if (templateRow.getCell(0).getParagraphs().get(0).getCTP().getPPr() != null) {
+                paragraph.getCTP().setPPr(templateRow.getCell(0).getParagraphs().get(0).getCTP().getPPr());
+            }
+            
+            // 创建新的run并设置项目名称和时间
+            XWPFRun run = paragraph.createRun();
+            run.setText(projectName + " (" + startDate + " - " + endDate + ")");
+            
+            // 处理项目描述，按换行符分割
+            String[] descriptionLines = description.split("\n");
+            for (int j = 0; j < descriptionLines.length; j++) {
+                // 获取或创建段落
+                if (nameCell.getParagraphs().size() <= j + 1) {
+                    paragraph = nameCell.addParagraph();
+                } else {
+                    paragraph = nameCell.getParagraphs().get(j + 1);
+                }
+                
+                // 设置段落属性（如果需要）
+                if (templateRow.getCell(0).getParagraphs().get(0).getCTP().getPPr() != null) {
+                    paragraph.getCTP().setPPr(templateRow.getCell(0).getParagraphs().get(0).getCTP().getPPr());
+                }
+                
+                // 创建新的run并设置文本
+                run = paragraph.createRun();
+                run.setText(descriptionLines[j]);
+            }
+            
+            // 设置垂直居中
+            CTTcPr tcPr = nameCell.getCTTc().getTcPr();
+            if (tcPr == null) {
+                tcPr = nameCell.getCTTc().addNewTcPr();
+            }
+            if (tcPr.getVAlign() == null) {
+                tcPr.addNewVAlign().setVal(STVerticalJc.CENTER);
+            } else {
+                tcPr.getVAlign().setVal(STVerticalJc.CENTER);
+            }
             
             // 3. 在最后一列写入角色
-            row.getCell(5).setText(role);
+            XWPFTableCell roleCell = row.getCell(5);
+            // 清空单元格中的现有内容
+            for (XWPFParagraph p : roleCell.getParagraphs()) {
+                for (XWPFRun r : p.getRuns()) {
+                    r.setText("", 0);
+                }
+            }
+            
+            // 获取或创建段落
+            if (roleCell.getParagraphs().isEmpty()) {
+                paragraph = roleCell.addParagraph();
+            } else {
+                paragraph = roleCell.getParagraphs().get(0);
+            }
+            
+            // 设置段落属性（如果需要）
+            if (templateRow.getCell(5).getParagraphs().get(0).getCTP().getPPr() != null) {
+                paragraph.getCTP().setPPr(templateRow.getCell(5).getParagraphs().get(0).getCTP().getPPr());
+            }
+            
+            // 创建新的run并设置文本
+            run = paragraph.createRun();
+            run.setText(role);
+            
+            // 设置垂直居中
+            tcPr = roleCell.getCTTc().getTcPr();
+            if (tcPr == null) {
+                tcPr = roleCell.getCTTc().addNewTcPr();
+            }
+            if (tcPr.getVAlign() == null) {
+                tcPr.addNewVAlign().setVal(STVerticalJc.CENTER);
+            } else {
+                tcPr.getVAlign().setVal(STVerticalJc.CENTER);
+            }
         }
         
         System.out.println("项目经验表格渲染完成，当前表格共有 " + table.getRows().size() + " 行");
