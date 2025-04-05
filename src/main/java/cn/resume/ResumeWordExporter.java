@@ -31,7 +31,7 @@ public class ResumeWordExporter {
         String inputFilePath = "D:\\projects\\jl_tools\\logs\\00603+邹智+工作简历.docx";
 
         //XWPFTemplate template = exportResumeToWord(inputFilePath);
-        BatchExportResumeToWord("D:\\BaiduSyncdisk\\工作目录\\商机\\202503中国银行湖南分行\\简历");
+        BatchExportResumeToWord("D:\\BaiduSyncdisk\\工作目录\\商机\\202503中国银行湖南分行\\简历\\备选");
     }
 
 

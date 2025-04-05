@@ -200,7 +200,14 @@ public class ProjectExperienceTablePolicy extends DynamicTableRenderPolicy {
                 
                 // 创建新的run并设置文本
                 run = paragraph.createRun();
-                run.setText(descriptionLines[j]);
+                
+                // 去除原始序号并添加新序号
+                String line = descriptionLines[j].trim();
+                // 去除行首的数字序号（包括数字、顿号、点号和空格）
+                line = line.replaceFirst("^\\d+[、.]\\s*", "");
+                // 添加新序号
+                line = (j + 1) + "、" + line;
+                run.setText(line);
             }
             
             // 设置垂直居中
