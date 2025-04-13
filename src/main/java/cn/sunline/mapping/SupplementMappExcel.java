@@ -45,7 +45,7 @@ public class SupplementMappExcel {
     }
     public static void supplementMappExcelMain(String filePath,String modelFilePath){
         LinkedHashMap<String, TableStructure> tableMap = ExcelTableStructureReader.readExcel(modelFilePath);
-        if (tableMap == null){
+        if (tableMap.isEmpty()){
             log.error("模型文件解析获取表结构信息失败: {}", modelFilePath);
             return;
         }

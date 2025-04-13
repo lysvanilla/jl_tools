@@ -15,20 +15,7 @@ public final class AppConstants {
     public static final String CONFIG_LOG_PATH = "log.path";
     public static final String CONFIG_FILE_TEMPLATE_PATH = "file.template.path";
     public static final String CONFIG_FILE_CONFIG_PATH = "file.config.path";
-    
-    // 功能代码常量
-    /*public static final String FUNCTION_WLH = "wlh";
-    public static final String FUNCTION_DDL = "ddl";
-    public static final String FUNCTION_DML = "dml";
-    public static final String FUNCTION_GEN_MAPP = "gen_mapp";
-    public static final String FUNCTION_GEN_TABLE = "gen_table";
-    public static final String FUNCTION_SUPP_MAPP = "supp_mapp";
-    public static final String FUNCTION_UPDATE_MAPP = "update_mapp";
-    public static final String FUNCTION_GET_RELA_TAB = "get_rela_tab";
-    public static final String FUNCTION_ZB = "zb";
-    public static final String FUNCTION_CF = "cf";
-    public static final String FUNCTION_HB = "hb";*/
-    
+
     // 参数名常量
     public static final String PARAM_FUNCTION = "f";
     public static final String PARAM_FILE_NAME = "file_name";

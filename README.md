@@ -1,6 +1,6 @@
 # 通用工具集
 
-这是一个用于处理简历文档的Java工具集，提供了简历解析、导出和文档处理等功能。
+这是一个用于处理简历文档和数据处理的Java工具集，提供了简历解析、导出、文档处理、网页内容抓取和HTTP客户端等功能。
 
 ## 功能特性
 
@@ -20,6 +20,7 @@
 - 支持项目经验表格的自定义渲染
 - 自动处理日期格式和计算
 - 支持自定义输出路径和文件名
+- 支持项目经验描述自动编号与格式化
 
 ### 文档合并工具 (WordDocumentMerger)
 - 支持合并多个Word文档
@@ -38,6 +39,19 @@
 - 支持批量处理
 - 保持表格的原始宽度和对齐方式
 - 支持自定义表格间距
+
+### 文档内容合并功能
+#### 主要类：DocumentBodyMerger
+- 功能：合并多个文档的正文内容（包括段落和表格）
+- 特性：
+  - 同时处理段落和表格内容
+  - 保持原始格式和样式
+  - 按文档内容顺序合并
+  - 支持批量处理
+- 格式保持：
+  - 段落格式（字体、大小、样式）
+  - 表格结构和宽度
+  - 文本格式化属性
 
 ### ETL 映射工具 (cn.sunline.mapping)
 #### 主要类：
@@ -82,7 +96,6 @@
 ### 用户界面 (cn.sunline.ui)
 #### 主要类：
 - **JavaFXInterface**: JavaFX 界面实现
-- **SwingInterfaceForMain**: Swing 界面实现
 - **JavaFXInterfaceForMain**: JavaFX 主界面实现
 
 功能特性：
@@ -90,6 +103,60 @@
 - 支持功能选择和参数配置
 - 实时日志显示
 - 支持文件选择和处理
+
+### 命令处理 (cn.sunline.command)
+#### 主要类：
+- **CommandHandler**: 命令处理器
+- **BatchCommand**: 批处理命令
+- **SingleCommand**: 单次处理命令
+
+功能特性：
+- 解析和执行命令行指令
+- 支持批量处理多个文件
+- 支持单一文件处理
+- 命令参数验证和错误处理
+
+### 功能模块 (cn.sunline.function)
+#### 主要类：
+- **FunctionManager**: 功能管理器
+- **FunctionRegistry**: 功能注册表
+- **FunctionExecutor**: 功能执行器
+- **FunctionContext**: 功能上下文
+
+功能特性：
+- 统一功能注册和管理
+- 功能调用与执行
+- 功能上下文传递
+- 功能扩展与插件支持
+- 功能调用链管理
+
+### 索引处理 (cn.sunline.index)
+#### 主要类：
+- **IndexBuilder**: 索引构建器
+- **IndexSearcher**: 索引搜索器
+- **IndexConfig**: 索引配置
+- **IndexDocument**: 索引文档
+
+功能特性：
+- 文档索引创建与管理
+- 全文搜索支持
+- 索引优化与维护
+- 批量索引处理
+- 高效检索与过滤
+
+### SQLite支持 (cn.sunline.sqlite)
+#### 主要类：
+- **SqliteManager**: SQLite管理器
+- **SqliteConnector**: SQLite连接器
+- **SqliteQuery**: SQLite查询
+- **SqliteTransaction**: SQLite事务
+
+功能特性：
+- 轻量级数据存储
+- 事务管理与并发控制
+- 数据查询与缓存
+- 数据库迁移与更新
+- 连接池管理
 
 ### 配置管理 (cn.sunline.config)
 #### 主要类：
@@ -101,17 +168,28 @@
 - 支持数据库配置
 - 配置文件加载和解析
 - 配置项访问和修改
+- 支持多种类型的配置项获取（字符串、整数、布尔值）
+- 支持默认值设置
 
 ### 工具类 (cn.sunline.util)
 #### 主要类：
 - **BasicInfo**: 基础信息工具类
+- **StringUtils**: 字符串处理工具类
+- **FileUtils**: 文件处理工具类
+- **DateUtils**: 日期处理工具类
+- **ExcelUtils**: Excel处理工具类
+- **WordUtils**: Word文档处理工具类
 - **ArgsUtil**: 参数解析工具类
 
 功能特性：
 - 提供基础信息和工具方法
-- 支持命令行参数解析
-- 文件路径处理
-- 时间处理
+- 字符串处理与格式化
+- 文件操作与路径处理
+- 日期和时间格式化与计算
+- Excel文件读写和处理
+- Word文档操作与格式化
+- 命令行参数解析
+- 通用数据转换
 
 ### 异常处理 (cn.sunline.exception)
 #### 主要类：
@@ -126,9 +204,11 @@
 ### 服务层 (cn.sunline.service)
 #### 主要类：
 - **FunctionService**: 功能服务类
+- **CommandFunctionService**: 命令功能服务类
 
 功能特性：
 - 功能执行管理
+- 数据处理与转换
 - 参数验证和处理
 - 错误处理和日志记录
 - 功能映射管理
@@ -138,12 +218,28 @@
 - **EtlMapp**: ETL 映射实体类
 - **TableStructure**: 表结构实体类
 - **TableFieldInfo**: 表字段信息实体类
+- **BatchTaskVO**: 批量任务对象
+- **ConfigVO**: 配置对象
 
 功能特性：
 - 数据模型定义
 - 实体关系映射
+- 批量任务配置与管理
+- 配置信息存储与获取
 - 数据验证和转换
 - 数据持久化支持
+
+### 项目经验表格渲染 (ProjectExperienceTablePolicy)
+- 功能：动态处理项目经验表格
+- 特性：
+  - 自动合并单元格
+  - 自动调整宽度
+  - 保持表格样式
+  - 设置垂直居中对齐
+  - 支持多行描述文本
+  - 自动处理描述序号
+  - 保留描述中的换行符
+  - 支持自定义渲染规则
 
 ## 项目结构
 
@@ -153,54 +249,98 @@ src/main/java/
 │   ├── resume/
 │   │   ├── TableBasedResumeParser.java    # 简历解析器
 │   │   ├── ResumeWordExporter.java        # 简历导出器
+│   │   ├── ResumeExcelWrite.java          # 简历Excel导出器
 │   │   ├── entity/                        # 实体类
 │   │   │   ├── Resume.java               # 简历实体
 │   │   │   ├── WorkExperience.java       # 工作经历
 │   │   │   └── ProjectExperience.java    # 项目经验
 │   │   ├── policy/                        # 渲染策略
-│   │   │   └── ProjectExperienceTablePolicy.java  # 项目经验表格渲染策略
+│   │   │   ├── ProjectExperienceTablePolicy.java  # 项目经验表格渲染策略
+│   │   │   └── WorkExperienceTablePolicy.java    # 工作经验表格渲染策略
 │   │   └── util/                          # 工具类
 │   │       ├── WordDocumentMerger.java    # 文档合并工具
+│   │       ├── DocumentBodyMerger.java    # 文档内容合并工具
 │   │       └── TableMerger.java          # 表格合并工具
 │   └── sunline/
 │       ├── Main.java                      # 主程序入口
+│       ├── command/                       # 命令处理
+│       │   ├── CommandHandler.java       # 命令处理器
+│       │   ├── BatchCommand.java         # 批处理命令
+│       │   └── SingleCommand.java        # 单次处理命令
 │       ├── config/                        # 配置管理
 │       │   ├── AppConfig.java            # 应用配置
 │       │   └── DatabaseConfigManager.java # 数据库配置
 │       ├── constant/                      # 常量定义
+│       │   └── AppConstants.java         # 应用常量
 │       ├── exception/                     # 异常处理
 │       │   └── BusinessException.java    # 业务异常
 │       ├── excel/                         # Excel处理
-│   │   │   ├── ExcelMerger.java          # Excel合并
-│   │   │   ├── ExcelSheetSplitter.java   # Excel拆分
-│   │   │   └── IndexExcelWrite.java      # 指标写入
-│   │   ├── function/                      # 功能模块
-│   │   ├── http/                          # HTTP相关
-│   │   ├── index/                         # 索引处理
-│   │   ├── mapping/                       # ETL映射
-│   │   │   ├── TableToEtlMapp.java       # 表转ETL映射
-│   │   │   ├── EtlMappToTable.java       # ETL映射转表
-│   │   │   ├── GenEtlMappExcel.java      # 生成ETL映射Excel
-│   │   │   └── BatchStandardizedModelExcel.java  # 批量标准化
-│   │   ├── service/                       # 服务层
-│   │   │   └── FunctionService.java      # 功能服务
-│   │   ├── sqlite/                        # SQLite支持
-│   │   ├── table/                         # 表格处理
-│   │   │   ├── ChineseToEnglishTranslator.java  # 中英文翻译
-│   │   │   ├── DdlTemplateFiller.java    # DDL模板填充
-│   │   │   └── ExcelTableStructureReader.java   # Excel表格结构读取
-│   │   ├── ui/                            # 用户界面
-│   │   │   ├── JavaFXInterface.java      # JavaFX界面
-│   │   │   ├── SwingInterfaceForMain.java # Swing界面
-│   │   │   └── JavaFXInterfaceForMain.java # JavaFX主界面
-│   │   ├── util/                          # 工具类
-│   │   │   ├── BasicInfo.java            # 基础信息
-│   │   │   └── ArgsUtil.java             # 参数解析
-│   │   ├── vo/                            # 数据对象
-│   │   │   ├── EtlMapp.java              # ETL映射实体
-│   │   │   ├── TableStructure.java       # 表结构实体
-│   │   │   └── TableFieldInfo.java       # 表字段信息
-│   │   └── web/                           # Web相关
+│       │   ├── ExcelMerger.java          # Excel合并
+│       │   ├── ExcelSheetSplitter.java   # Excel拆分
+│       │   └── IndexExcelWrite.java      # 指标写入
+│       ├── function/                      # 功能模块
+│       │   ├── FunctionManager.java      # 功能管理器
+│       │   ├── FunctionRegistry.java     # 功能注册表
+│       │   ├── FunctionExecutor.java     # 功能执行器
+│       │   └── FunctionContext.java      # 功能上下文
+│       ├── http/                          # HTTP相关
+│       │   ├── OAuthClient.java          # OAuth客户端
+│       │   ├── HutoolOAuthClient.java    # 基于Hutool的OAuth客户端
+│       │   └── WorkflowApiClient.java    # 工作流API客户端
+│       ├── index/                         # 索引处理
+│       │   ├── IndexBuilder.java         # 索引构建器
+│       │   ├── IndexSearcher.java        # 索引搜索器
+│       │   ├── IndexConfig.java          # 索引配置
+│       │   └── IndexDocument.java        # 索引文档
+│       ├── mapping/                       # ETL映射
+│       │   ├── TableToEtlMapp.java       # 表转ETL映射
+│       │   ├── EtlMappToTable.java       # ETL映射转表
+│       │   ├── GenEtlMappExcel.java      # 生成ETL映射Excel
+│       │   ├── BatchStandardizedModelExcel.java  # 批量标准化物理模型
+│       │   └── BatchStandardizedMappExcel.java   # 批量标准化映射文档
+│       ├── service/                       # 服务层
+│       │   ├── FunctionService.java      # 功能服务
+│       │   └── DataService.java          # 数据服务
+│       ├── sqlite/                        # SQLite支持
+│       │   ├── SqliteManager.java        # SQLite管理器
+│       │   ├── SqliteConnector.java      # SQLite连接器
+│       │   ├── SqliteQuery.java          # SQLite查询
+│       │   └── SqliteTransaction.java    # SQLite事务
+│       ├── table/                         # 表格处理
+│       │   ├── ChineseToEnglishTranslator.java  # 中英文翻译
+│       │   ├── DdlTemplateFiller.java    # DDL模板填充
+│       │   ├── ExcelTableStructureReader.java   # Excel表格结构读取
+│       │   └── StandardizedMappingRelationReader.java  # 标准化映射关系读取器
+│       ├── ui/                            # 用户界面
+│       │   ├── JavaFXInterface.java      # JavaFX界面
+│       │   └── JavaFXInterfaceForMain.java # JavaFX主界面
+│       ├── util/                          # 工具类
+│       │   ├── BasicInfo.java            # 基础信息
+│       │   ├── StringUtils.java          # 字符串工具
+│       │   ├── FileUtils.java            # 文件工具
+│       │   ├── DateUtils.java            # 日期工具
+│       │   ├── ExcelUtils.java           # Excel工具
+│       │   ├── WordUtils.java            # Word文档工具
+│       │   └── ArgsUtil.java             # 参数解析
+│       ├── vo/                            # 数据对象
+│       │   ├── EtlMapp.java              # ETL映射实体
+│       │   ├── TableStructure.java       # 表结构实体
+│       │   ├── BatchTaskVO.java          # 批量任务对象
+│       │   ├── ConfigVO.java             # 配置对象
+│       │   └── TableFieldInfo.java       # 表字段信息
+│       └── web/                           # Web相关
+│           ├── WebContentReader_HNNX.java  # 湖南农信网页内容读取器
+│           ├── WebContentReader_JXNX.java  # 江西农信网页内容读取器
+│           ├── WebContentReader_JXYH.java  # 江西银行网页内容读取器
+│           └── WebContentReader_SCNX.java  # 四川农信网页内容读取器
+└── resources/
+    ├── application.properties           # 应用配置文件
+    ├── templates/                        # 模板目录
+    │   ├── resume/                      # 简历模板
+    │   ├── etl/                         # ETL映射模板
+    │   └── ddl/                         # DDL模板
+    └── images/                          # 图像资源目录
+        └── app_icon.png                  # 应用图标
 ```
 
 ## 核心功能详解
@@ -228,6 +368,8 @@ src/main/java/
   - 自动计算工作年限
   - 计算任职时间
   - 处理日期格式
+  - 自动处理项目经验描述的序号
+  - 保留描述中的换行符
 - 批量处理：
   - 支持目录批量处理
   - 自动生成输出文件名
@@ -257,6 +399,138 @@ src/main/java/
   - 单元格样式
   - 文本格式
 
+### 文档内容合并功能
+#### 主要类：DocumentBodyMerger
+- 功能：合并多个文档的正文内容（包括段落和表格）
+- 特性：
+  - 同时处理段落和表格内容
+  - 保持原始格式和样式
+  - 按文档内容顺序合并
+  - 支持批量处理
+- 格式保持：
+  - 段落格式（字体、大小、样式）
+  - 表格结构和宽度
+  - 文本格式化属性
+
+### 网页内容抓取功能
+#### 主要类：
+- **WebContentReader_HNNX**: 湖南农信网页内容读取器
+- **WebContentReader_JXNX**: 江西农信网页内容读取器
+- **WebContentReader_JXYH**: 江西银行网页内容读取器
+- **WebContentReader_SCNX**: 四川农信网页内容读取器
+
+功能特性：
+- 使用Jsoup解析HTML内容
+- 支持批量抓取多页内容
+- 自动提取链接和文本
+- 支持按条件过滤内容
+- 结果以Map形式返回
+
+### HTTP客户端功能
+#### 主要类：
+- **OAuthClient**: 基于Apache HttpClient的OAuth客户端
+- **HutoolOAuthClient**: 基于Hutool的OAuth客户端
+- **WorkflowApiClient**: 工作流API客户端
+
+功能特性：
+- 支持OAuth 2.0认证
+- 支持HTTPS请求
+- 自定义SSL配置
+- 支持表单参数提交
+- 支持异步请求
+- 灵活的响应处理
+
+### 功能模块使用
+```java
+// 注册功能
+FunctionRegistry registry = FunctionRegistry.getInstance();
+registry.register("exportResume", new ResumeExportFunction());
+
+// 执行功能
+FunctionContext context = new FunctionContext();
+context.put("inputFile", "path/to/input.docx");
+context.put("outputFile", "path/to/output.docx");
+FunctionExecutor.execute("exportResume", context);
+```
+
+### 命令处理
+```java
+// 处理单个命令
+String[] args = {"--type", "resume", "--input", "path/to/file.docx", "--output", "path/to/output.docx"};
+CommandHandler.handle(args);
+
+// 批量处理命令
+String[] batchArgs = {"--batch", "--type", "merge", "--dir", "path/to/directory", "--output", "path/to/output.docx"};
+BatchCommand.execute(batchArgs);
+
+// 自定义命令
+SingleCommand command = new SingleCommand();
+command.setType("custom");
+command.setInputPath("path/to/input");
+command.setOutputPath("path/to/output");
+command.execute();
+```
+
+### 索引处理
+```java
+// 创建索引
+IndexBuilder builder = new IndexBuilder("path/to/index");
+builder.addDocument(new IndexDocument("doc1", "文档内容"));
+builder.build();
+
+// 搜索索引
+IndexSearcher searcher = new IndexSearcher("path/to/index");
+List<IndexDocument> results = searcher.search("查询关键词");
+```
+
+### SQL连接操作
+```java
+// 建立连接
+SqliteConnector connector = SqliteManager.getConnector("path/to/database.db");
+
+// 执行查询
+SqliteQuery query = connector.createQuery("SELECT * FROM users WHERE name = ?");
+query.setParameter(1, "张三");
+List<Map<String, Object>> results = query.executeQuery();
+
+// 事务操作
+SqliteTransaction transaction = connector.beginTransaction();
+try {
+    connector.execute("INSERT INTO users (name, age) VALUES (?, ?)", "李四", 30);
+    transaction.commit();
+} catch (Exception e) {
+    transaction.rollback();
+}
+```
+
+### 服务层操作
+```java
+// 使用功能服务
+FunctionService functionService = new FunctionService();
+boolean success = functionService.executeFunction("exportResume", "path/to/input.docx", "path/to/output.docx");
+
+// 使用数据服务
+DataService dataService = new DataService();
+List<Map<String, Object>> data = dataService.queryData("SELECT * FROM table");
+boolean saved = dataService.saveData(data, "targetTable");
+```
+
+### 数据对象操作
+```java
+// 使用批量任务对象
+BatchTaskVO task = new BatchTaskVO();
+task.setTaskName("数据迁移任务");
+task.setSourcePath("path/to/source");
+task.setTargetPath("path/to/target");
+task.setTaskType("MIGRATION");
+
+// 使用配置对象
+ConfigVO config = new ConfigVO();
+config.setConfigName("系统配置");
+config.setConfigValue("value");
+config.setDescription("配置描述");
+```
+
 ### ETL 映射处理
 ```java
 // 物理模型转 ETL 映射
@@ -299,34 +573,19 @@ ChineseToEnglishTranslator.writeTranslatorExcel(inputFile, outputPath);
 // 启动 JavaFX 界面
 JavaFXInterface.main(new String[]{});
 
-// 启动 Swing 界面
-SwingInterfaceForMain.main(new String[]{});
+// 启动 JavaFX 主界面
+JavaFXInterfaceForMain.main(new String[]{});
 ```
 
-## 使用示例
-
-### 解析简历
+### 命令行使用
 ```java
-String filePath = "path/to/resume.docx";
-Resume resume = TableBasedResumeParser.parseResume(filePath);
-```
+// 单一命令执行
+String[] args = new String[]{"--type", "resume", "--input", "path/to/file.docx", "--output", "path/to/output.docx"};
+CommandHandler.handle(args);
 
-### 导出简历
-```java
-// 单个文件导出
-String inputPath = "path/to/resume.docx";
-XWPFTemplate template = ResumeWordExporter.exportResumeToWord(inputPath);
-
-// 批量导出
-String inputDir = "path/to/resume/directory";
-ResumeWordExporter.BatchExportResumeToWord(inputDir);
-```
-
-### 合并文档
-```java
-String inputDir = "path/to/documents";
-String outputPath = "path/to/output.docx";
-boolean success = WordDocumentMerger.mergeDirectory(inputDir, outputPath);
+// 批量处理命令
+String[] batchArgs = new String[]{"--batch", "--type", "merge", "--dir", "path/to/directory", "--output", "path/to/output.docx"};
+BatchCommand.execute(batchArgs);
 ```
 
 ### 合并表格
@@ -336,50 +595,41 @@ String outputPath = "path/to/output.docx";
 boolean success = TableMerger.mergeTablesFromDirectory(inputDir, outputPath);
 ```
 
-### ETL 映射处理
+### 合并文档内容
 ```java
-// 物理模型转 ETL 映射
-String filePath = "path/to/physical/model.xlsx";
-TableToEtlMapp.tableToEtlMapp(filePath);
-
-// ETL 映射转物理模型
-String mappingPath = "path/to/etl/mapping.xlsx";
-EtlMappToTable.etlMappToTableMain(mappingPath);
+String inputDir = "path/to/documents";
+String outputPath = "path/to/output.docx";
+boolean success = DocumentBodyMerger.mergeBodiesFromDirectory(inputDir, outputPath);
 ```
 
-### Excel 处理
+### 网页内容抓取
 ```java
-// Excel 合并
-String inputDir = "path/to/excel/files";
-String outputPath = "path/to/output.xlsx";
-ExcelMerger.mergeExcelFiles(inputDir, outputPath);
+// 湖南农信网页内容抓取
+String url = "http://www.hnnxs.com/node/85.jspx";
+Map<String, String> linkMap = WebContentReader_HNNX.extractLinksFromPage(url);
 
-// Excel 拆分
-String inputFile = "path/to/input.xlsx";
-String outputDir = "path/to/output/dir";
-ExcelSheetSplitter.splitExcelSheets(inputFile, outputDir);
+// 批量抓取多页内容
+int startPage = 1;
+int endPage = 10;
+Map<String, String> allLinksMap = WebContentReader_SCNX.extractLinksByPage(startPage, endPage);
 ```
 
-### 表格处理
+### HTTP客户端使用
 ```java
-// 生成 DDL 语句
-String inputFile = "path/to/table/structure.xlsx";
-String outputPath = "path/to/output.sql";
-DdlTemplateFiller.genDdlSql(inputFile, outputPath);
+// 使用Hutool的OAuth客户端
+String url = "https://example.com/oauth/token";
+HttpResponse response = HttpRequest.post(url)
+        .setSSLProtocol("SSLv3")
+        .form("client_id", "your_client_id")
+        .form("client_secret", "your_client_secret")
+        .form("username", "your_username")
+        .form("password", "your_password")
+        .form("grant_type", "password")
+        .execute();
 
-// 中英文翻译
-String inputFile = "path/to/input.xlsx";
-String outputPath = "path/to/output.xlsx";
-ChineseToEnglishTranslator.writeTranslatorExcel(inputFile, outputPath);
-```
-
-### 用户界面使用
-```java
-// 启动 JavaFX 界面
-JavaFXInterface.main(new String[]{});
-
-// 启动 Swing 界面
-SwingInterfaceForMain.main(new String[]{});
+// 使用工作流API客户端
+String accessToken = WorkflowApiClient.getAccessToken();
+boolean result = WorkflowApiClient.addTaskDependency(accessToken, "TASK_123", "YES", "TASK_456");
 ```
 
 ## 配置说明
@@ -404,11 +654,29 @@ SwingInterfaceForMain.main(new String[]{});
 
 ### 应用配置
 - 配置文件：`application.properties`
+- 主要类：`AppConfig`
 - 配置项：
+  - 应用名称和版本：`app.name`, `app.version`
+  - 日志配置：`log.level`, `log.path`, `log.file.max.size`, `log.file.max.history`
+  - 文件路径配置：`file.template.path`, `file.config.path`
+  - UI配置：`ui.window.width`, `ui.window.height`, `ui.window.title`
   - 数据库连接信息
-  - 文件路径配置
-  - 日志级别设置
   - 其他系统参数
+
+使用示例：
+```java
+// 获取字符串配置项
+String appName = AppConfig.getProperty("app.name");
+
+// 获取带默认值的字符串配置项
+String logPath = AppConfig.getProperty("log.path", "logs");
+
+// 获取整数配置项
+int windowWidth = AppConfig.getIntProperty("ui.window.width", 800);
+
+// 获取布尔配置项
+boolean showSql = AppConfig.getBooleanProperty("db.show.sql", false);
+```
 
 ### 数据库配置
 - 配置文件：`db.setting`
@@ -426,12 +694,19 @@ SwingInterfaceForMain.main(new String[]{});
   - 标准化模板
   - 其他业务模板
 
+## 版本信息
+
+当前版本：202503141826
+
 ## 依赖项
 
 - Apache POI: 用于处理Word文档
 - poi-tl: 用于模板渲染
 - Lombok: 用于简化代码
 - SLF4J: 用于日志记录
+- Hutool: 用于常用工具方法和HTTP请求
+- Jsoup: 用于解析HTML内容
+- Apache HttpClient: 用于HTTP请求
 
 ## 注意事项
 
@@ -480,16 +755,20 @@ SwingInterfaceForMain.main(new String[]{});
    - 支持更多文件格式
    - 添加更多数据处理功能
    - 增强用户界面交互
+   - 完善网页内容抓取功能
+   - 扩展HTTP客户端功能
 
 3. 代码质量：
    - 增加单元测试
    - 完善异常处理
    - 优化代码结构
+   - 改进配置管理
 
 4. 文档完善：
    - 添加详细的使用说明
    - 完善 API 文档
    - 添加示例代码
+   - 更新网页内容抓取和HTTP客户端的文档
 
 ## 贡献指南
 

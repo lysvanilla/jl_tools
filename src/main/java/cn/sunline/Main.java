@@ -1,44 +1,64 @@
 package cn.sunline;
 
-import cn.sunline.excel.ExcelMerger;
-import cn.sunline.excel.ExcelSheetSplitter;
-import cn.sunline.index.IndexExcelWrite;
-import cn.sunline.mapping.*;
-import cn.sunline.table.ChineseToEnglishTranslator;
-import cn.sunline.table.DdlTemplateFiller;
+import cn.sunline.command.Command;
+import cn.sunline.command.CommandException;
+import cn.sunline.command.CommandFactory;
 import cn.sunline.util.BasicInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
+
 import java.util.HashMap;
+
 import static cn.sunline.util.ArgsUtil.parseArgs;
 import static cn.sunline.util.BasicInfo.verifyLicense;
 
+/**
+ * 主程序入口类，负责解析命令行参数并执行相应的命令
+ */
 @Slf4j
 public class Main {
     private static final String VERSION = "202503141826";
 
+    /**
+     * 程序入口方法
+     * @param args 命令行参数
+     */
     public static void main(String[] args) {
-        // 输出当前编译版本
-        log.info("current version:{}", VERSION);
+        // 使用MDC记录操作上下文
+        MDC.put("version", VERSION);
 
-        // 处理无参数或 help 参数的情况
-        if (args.length == 0 || isHelpArgument(args[0])) {
-            printHelpInfo();
-            return;
+        try {
+            // 输出当前编译版本
+            log.info("当前版本: {}", VERSION);
+
+            // 处理无参数或 help 参数的情况
+            if (args.length == 0 || isHelpArgument(args[0])) {
+                printHelpInfo();
+                return;
+            }
+
+            // 解析命令行参数
+            HashMap<String, String> argsMap = parseArgs(args);
+            String dealFun = argsMap.get("f");
+
+            // 检查是否提供了 f 参数
+            if (StringUtils.isEmpty(dealFun)) {
+                log.error("未输入 f 参数，该参数必输，目前支持下述操作：\n{}", BasicInfo.HELP_FILE);
+                return;
+            }
+
+            // 验证许可证
+            verifyLicense();
+
+            // 根据 f 参数的值执行相应的操作
+            executeOperation(dealFun, argsMap);
+        } catch (Exception e) {
+            log.error("程序执行过程中发生异常: {}", e.getMessage(), e);
+        } finally {
+            // 清理MDC上下文
+            MDC.remove("version");
         }
-
-        // 解析命令行参数
-        HashMap<String, String> argsMap = parseArgs(args);
-        String dealFun = argsMap.get("f");
-
-        // 检查是否提供了 f 参数
-        if (StringUtils.isEmpty(dealFun)) {
-            log.error("未输入 f 参数，该参数必输，目前支持下述操作：\n{}", BasicInfo.HELP_FILE);
-            return;
-        }
-        verifyLicense();
-        // 根据 f 参数的值执行相应的操作
-        executeOperation(dealFun, argsMap);
     }
 
     /**
@@ -54,6 +74,7 @@ public class Main {
      * 打印帮助信息
      */
     private static void printHelpInfo() {
+        log.info("显示帮助信息");
         System.out.println(BasicInfo.HELP_FILE);
     }
 
@@ -63,48 +84,18 @@ public class Main {
      * @param argsMap 命令行参数映射
      */
     private static void executeOperation(String dealFun, HashMap<String, String> argsMap) {
-        switch (dealFun) {
-            case "wlh":  //物理化
-                new ChineseToEnglishTranslator().writeTranslatorExcel(argsMap);
-                break;
-            case "ddl":  //创建DDL建表语句
-                new DdlTemplateFiller().genDdlSql(argsMap);
-                break;
-            case "dml":  //创建DML脚本
-                new DmlTemplateFiller().genDmlSqlMain(argsMap);
-                break;
-            case "gen_mapp":  //接口层映射文档生成
-                new TableToEtlMapp().tableToEtlMapp(argsMap);
-                break;
-            case "gen_table":  //物理模型初稿生成
-                new EtlMappToTable().etlMappToTableMain(argsMap);
-                break;
-            case "std_table":  //标准化物理模型
-                new BatchStandardizedModelExcel().batchUpdateModelExcelMain(argsMap);
-                break;
-            case "std_mapp":  //标准化映射文档
-                new BatchStandardizedMappExcel().batchUpdateMappExcelMain(argsMap);
-                break;
-            case "supp_mapp":  //补充映射文档模板
-                new SupplementMappExcel().supplementMappExcelMain(argsMap);
-                break;
-            case "update_mapp":  //更新映射文档模板
-                new BatchUpdateMappExcel().batchUpdateMappExcelMain(argsMap);
-                break;
-            case "get_rela_tab":  //获取模型依赖表
-                new GetEtlMappTable().getEtlMappTableMain(argsMap);
-                break;
-            case "zb":  //智能风控系统指标转换成标准模板
-                new IndexExcelWrite().writeIndexExcel(argsMap);
-                break;
-            case "cf":  //EXCEL拆分
-                new ExcelSheetSplitter().splitExcelSheets(argsMap);
-                break;
-            case "hb":   //EXCEL合并
-                new ExcelMerger().mergeExcelFiles(argsMap);
-                break;
-            default:
-                log.error("输入的命令不支持，目前只支持下述操作：\n{}", BasicInfo.HELP_FILE);
+        // 从命令工厂获取命令
+        Command command = CommandFactory.getCommand(dealFun);
+
+        if (command != null) {
+            try {
+                // 执行命令
+                command.execute(argsMap);
+            } catch (CommandException e) {
+                log.error("执行命令 '{}' 时发生错误: {}", dealFun, e.getMessage(), e);
+            }
+        } else {
+            log.error("输入的命令 '{}' 不支持，目前只支持下述操作：\n{}", dealFun, BasicInfo.HELP_FILE);
         }
     }
 }
