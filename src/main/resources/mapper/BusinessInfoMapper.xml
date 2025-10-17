@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.BusinessInfoMapper">
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.example.entity.BusinessInfo">
+        <result column="BUSI_DATE" property="busiDate" jdbcType="VARCHAR"/>
+        <result column="CSR_NS_CREDITRATE" property="csrNsCreditrate" jdbcType="VARCHAR"/>
+        <result column="CSR_NS_CREDITRATE2" property="csrNsCreditrate2" jdbcType="VARCHAR"/>
+        <result column="BUSI_DATE2" property="busiDate2" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 根据主键查询 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        BUSI_DATE,
+        CSR_NS_CREDITRATE,
+        CSR_NS_CREDITRATE2,
+        BUSI_DATE2
+        from your_table_name <!-- 请替换为实际表名 -->
+        where ID = #{id,jdbcType=BIGINT}
+    </select>
+
+    <!-- 动态更新（非空字段才更新） -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.entity.BusinessInfo">
+        update your_table_name <!-- 请替换为实际表名 -->
+        <set>
+        <if test="busiDate != null">
+            BUSI_DATE = #{busiDate,jdbcType=VARCHAR},
+        </if>
+        <if test="csrNsCreditrate != null">
+            CSR_NS_CREDITRATE = #{csrNsCreditrate,jdbcType=VARCHAR},
+        </if>
+        <if test="csrNsCreditrate2 != null" >
+            CSR_NS_CREDITRATE2 = #{csrNsCreditrate2,jdbcType=VARCHAR},
+        </if>
+        <if test="busiDate2 != null">
+            BUSI_DATE2 = #{busiDate2,jdbcType=VARCHAR},
+        </if>
+        </set>
+        where ID = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>
